@@ -1,0 +1,29 @@
+{
+  "_comment": "F1.6. Which files the engine owns. Paths are as in this repo; globs use fnmatch, so * also crosses /. init-vault.py reads this file: it fills engine files with organisation values only, then writes a sha256 of each installed engine file to engine.lock at the vault root. engine-upgrade.py and lint (engine-drift) read the lock. Every other file in a vault belongs to the vault. Templates that init-vault.py places as vault content (its PLACE list) are not engine files.",
+  "include": [
+    ".scripts/**",
+    ".github/**",
+    "templates/**",
+    "docs/**",
+    "examples/**",
+    "3_RESOURCES/AI Skills/**",
+    "3_RESOURCES/processes/lint_process.md",
+    "_metrics/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "LICENSE",
+    ".gitattributes",
+    "vault-manifest.json",
+    "engine-files.json"
+  ],
+  "exclude": [
+    ".scripts/lint.config.org.json",
+    "*.upstream"
+  ],
+  "_remapComment": "Where an engine folder lands in a vault: [engine path, vault path]. P: = the private vault. Files that land in the private vault are not in the lock yet (shortcut: upgrade them by hand).",
+  "remap": [
+    ["_metrics", "2_AREAS/{{ORG}}/_metrics"],
+    ["private/3_RESOURCES/AI Skills", "P:3_RESOURCES/AI Skills"]
+  ]
+}
