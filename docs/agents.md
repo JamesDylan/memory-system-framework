@@ -46,6 +46,7 @@ Start with one seat. `meeting-ingest` gives the most value; `kr-feed` is the che
 - Claude Code installed, with `claude` on your PATH.
 - The vault built with `init-vault.py` and committed to git.
 - The seat copied in, evals included: `cp -R examples/seats/<seat> 2_AREAS/Agents/` (from the vault root). Paths below are relative to the vault root.
+- Seats that call another seat need it copied in too: `team-sync` runs `meeting-ingest`'s gate (without it, every round exits quietly), and `meeting-ingest` calls `dispatcher`.
 
 ### 2. Make the accounts and tokens (you, not your agent)
 
