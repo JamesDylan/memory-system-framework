@@ -12,15 +12,21 @@ Then, for each engine file (shared vault only):
   unchanged here, changed upstream     -> replaced
   changed here, unchanged upstream     -> local edit kept
   changed here and upstream            -> conflict: upstream copy written to <file>.upstream
-  new upstream (or missing here)       -> added
+  new upstream                         -> added
+  new upstream, but your own file there -> name clash: yours is left alone and kept out of the lock
+  deleted here on purpose              -> left deleted; the lock records it as null (opted out)
+  a folder or unreadable path there    -> skipped (old lock entry kept)
   gone upstream                        -> listed, not deleted, dropped from the lock
-It rewrites engine.lock (a conflict keeps its old hash, so lint still shows the drift) and
-never commits. It refuses to run on a dirty git tree unless --allow-dirty.
+It plans every file before writing any, then rewrites engine.lock (a conflict records the
+upstream hash, so the next upgrade compares against it) and never commits. It refuses to run
+on a dirty git tree unless --allow-dirty.
 --adopt writes a first lock for a vault that has none (hashes from the filled tag) and lists
 every engine file that differs from the tag. --values is a JSON with the organisation values
-(ORG and PRODUCT at least; same keys as templates/answers.example.json).
+(all seven organisation keys; same keys as templates/answers.example.json).
 """
 import hashlib, json, os, shutil, subprocess, sys, tempfile
+
+ORG_KEYS = ("ORG", "ORG_LOWER", "PRODUCT", "PRODUCT_LOWER", "PRODUCT_LONG", "PARTNER", "SLACK_WORKSPACE")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCK = "engine.lock"
@@ -31,6 +37,8 @@ def sha(path):
         return hashlib.sha256(open(path, "rb").read()).hexdigest()
     except FileNotFoundError:
         return None
+    except OSError:  # a folder, or unreadable: never overwrite it
+        return "blocked"
 
 
 def run(*cmd, cwd=None):
@@ -78,29 +86,43 @@ def upgrade(vault, tag, repo=None, allow_dirty=False, adopt_values=None):
     with tempfile.TemporaryDirectory() as tmp:
         up_dir, up = build(tag, repo, old["values"], tmp)
         upf, oldf = up["files"], old["files"]
-        out = {k: [] for k in ("replaced", "kept", "conflict", "added", "removed", "differs")}
+        out = {k: [] for k in ("replaced", "kept", "conflict", "added", "removed", "deleted", "clash", "skipped", "differs")}
         if adopt_values is not None:  # a first lock: hashes from the filled tag, local files untouched
             out["differs"] = [p for p in sorted(upf) if sha(os.path.join(vault, p)) != upf[p]]
             write_lock(vault, tag, repo, up["values"], upf)
             return out
-        files = {}
+        files, plan = {}, []  # plan: (path, kind) for files to write; nothing is written until every path is classified
         for p in sorted(set(upf) | set(oldf)):
             here, new, was = sha(os.path.join(vault, p)), upf.get(p), oldf.get(p)
-            take = lambda: (os.makedirs(os.path.dirname(os.path.join(vault, p)) or vault, exist_ok=True),
-                            shutil.copy2(os.path.join(up_dir, p), os.path.join(vault, p)))
-            if new is None:
+            opted = p in oldf and was is None  # deleted here on an earlier upgrade
+            if here == "blocked":
+                out["skipped"].append(p); files.update({p: was} if was else {})
+            elif new is None:
                 out["removed"].append(p)  # not deleted; no longer engine-owned, so out of the lock
+            elif here is None and (was is not None or opted):
+                files[p] = None  # you deleted it: respect that, now and on later upgrades
+                out["deleted"].append(p) if not opted else None
             elif here is None:
-                take(); out["added"].append(p); files[p] = new
+                plan.append((p, "added")); files[p] = new
             elif here == new:
                 files[p] = new  # already what upstream has
-            elif was is not None and here == was:
-                take(); out["replaced"].append(p); files[p] = new
-            elif was is not None and new == was:
+            elif was is None:
+                out["clash"].append(p)  # your own file at a new engine path: never touch it, never lock it
+            elif here == was:
+                plan.append((p, "replaced")); files[p] = new
+            elif new == was:
                 out["kept"].append(p); files[p] = was
-            else:  # changed here and upstream (or new upstream but a different local file is in the way)
-                shutil.copy2(os.path.join(up_dir, p), os.path.join(vault, p + ".upstream"))
-                out["conflict"].append(p); files[p] = was or new
+            else:  # changed here and upstream: lock the upstream hash, so a merged file is not a conflict again next time
+                plan.append((p, "conflict")); files[p] = new
+        for p, kind in plan:
+            dst = os.path.join(vault, p + (".upstream" if kind == "conflict" else ""))
+            try:
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                shutil.copy2(os.path.join(up_dir, p), dst)
+                out[kind].append(p)
+            except OSError as e:  # e.g. a file where a parent folder should be; keep going, lock what was there
+                out["skipped"].append(f"{p} ({e.strerror})")
+                files.pop(p, None) if kind == "added" else files.__setitem__(p, oldf[p])
         write_lock(vault, tag, repo, old["values"], files)
         return out
 
@@ -113,7 +135,10 @@ def report(tag, out, adopt=False):
     print(f"Engine upgraded to {tag}. Nothing committed.")
     for k, what in (("replaced", "Replaced"), ("added", "Added"), ("kept", "Local edit kept (upstream unchanged)"),
                     ("conflict", "Conflict: upstream copy in <file>.upstream; merge it, then delete the .upstream file"),
-                    ("removed", "Removed upstream (not deleted here; delete it if you do not need it)")):
+                    ("removed", "Removed upstream (not deleted here; delete it if you do not need it)"),
+                    ("deleted", "Deleted here, left deleted and no longer tracked"),
+                    ("clash", "Name clash: a file of yours is where the engine now has one; rename yours, then upgrade again"),
+                    ("skipped", "Skipped: a folder or unreadable path is in the way; fix it, then upgrade again")):
         print(f"\n{what}: {len(out[k])}")
         print(*("  " + p for p in out[k]), sep="\n") if out[k] else None
     print("\nNext: review `git diff`, run `node .scripts/lint.mjs`, then commit on a branch.")
@@ -138,24 +163,26 @@ json.dump({"engine": "dev", "repo": "", "values": v, "files": files}, open(os.pa
         eng, vault = os.path.join(t, "engine"), os.path.join(t, "vault")
         os.makedirs(eng); git(eng, "init", "-q")
         write(eng, "init-vault.py", init)
-        for f, txt in {"same": "same {{ORG}}", "repl": "v1", "keep": "v1", "conf": "v1", "gone": "v1", "miss": "v1"}.items():
+        for f, txt in {"same": "same {{ORG}}", "repl": "v1", "keep": "v1", "conf": "v1", "gone": "v1", "miss": "v1", "dir": "v1"}.items():
             write(eng, "eng/" + f, txt)
         git(eng, "add", "-A"); git(eng, "commit", "-qm", "1"); git(eng, "tag", "t1")
-        for f, txt in {"repl": "v2 {{PRODUCT}}", "conf": "v2", "new": "new"}.items():
+        for f, txt in {"repl": "v2 {{PRODUCT}}", "conf": "v2", "new": "new", "clash": "engine", "dir": "v2"}.items():
             write(eng, "eng/" + f, txt)
         os.remove(os.path.join(eng, "eng/gone"))
         git(eng, "add", "-A"); git(eng, "commit", "-qm", "2"); git(eng, "tag", "t2")
         # trial vault: adopt t1 (local "keep" already edited), then edit "conf", delete "miss"
         os.makedirs(vault); git(vault, "init", "-q")
         a = os.path.join(t, "values.json"); json.dump({"ORG": "Acme", "PRODUCT": "Widgets"}, open(a, "w"))
-        for f in ("same", "repl", "keep", "conf", "gone", "miss"):
+        for f in ("same", "repl", "keep", "conf", "gone", "miss", "dir"):
             write(vault, "eng/" + f, {"same": "same Acme", "keep": "local"}.get(f, "v1"))
         out = upgrade(vault, "t1", eng, allow_dirty=True, adopt_values=json.load(open(a)))
         assert out["differs"] == ["eng/keep"], out
         lock = json.load(open(os.path.join(vault, LOCK)))
-        assert lock["engine"] == "t1" and lock["values"] == {"ORG": "Acme", "PRODUCT": "Widgets"} and len(lock["files"]) == 6, lock
+        assert lock["engine"] == "t1" and lock["values"] == {"ORG": "Acme", "PRODUCT": "Widgets"} and len(lock["files"]) == 7, lock
         write(vault, "eng/conf", "local")
-        os.remove(os.path.join(vault, "eng/miss"))
+        os.remove(os.path.join(vault, "eng/miss"))  # deleted on purpose
+        write(vault, "eng/clash", "mine")  # the user's own file where t2 adds an engine file
+        os.remove(os.path.join(vault, "eng/dir")); write(vault, "eng/dir/note", "mine")  # a folder where an engine file was
         git(vault, "add", "-A"); git(vault, "commit", "-qm", "vault")
         write(vault, "dirt", "x")
         try:
@@ -168,11 +195,22 @@ json.dump({"engine": "dev", "repo": "", "values": v, "files": files}, open(os.pa
         assert out["replaced"] == ["eng/repl"] and rd("eng/repl") == "v2 Widgets", out
         assert out["kept"] == ["eng/keep"] and rd("eng/keep") == "local", out
         assert out["conflict"] == ["eng/conf"] and rd("eng/conf") == "local" and rd("eng/conf.upstream") == "v2", out
-        assert sorted(out["added"]) == ["eng/miss", "eng/new"] and rd("eng/new") == "new", out
+        assert out["added"] == ["eng/new"] and rd("eng/new") == "new", out
+        assert out["deleted"] == ["eng/miss"] and not os.path.exists(os.path.join(vault, "eng/miss")), out
+        assert out["clash"] == ["eng/clash"] and rd("eng/clash") == "mine", out
+        assert out["skipped"] == ["eng/dir"] and rd("eng/dir/note") == "mine", out
         assert out["removed"] == ["eng/gone"] and rd("eng/gone") == "v1", out
         lock2 = json.load(open(os.path.join(vault, LOCK)))
         assert lock2["engine"] == "t2" and "eng/gone" not in lock2["files"], lock2
-        assert lock2["files"]["eng/conf"] == lock["files"]["eng/conf"], "a conflict keeps its old hash, so drift still shows"
+        assert lock2["files"]["eng/conf"] == sha(os.path.join(vault, "eng/conf.upstream")), "a conflict locks the upstream hash"
+        assert lock2["files"]["eng/miss"] is None and "eng/clash" not in lock2["files"], lock2
+        assert lock2["files"]["eng/dir"] == lock["files"]["eng/dir"], "a skipped path keeps its old lock entry"
+        # resolve the conflict, then upgrade to the same tag again: no conflict comes back
+        write(vault, "eng/conf", "merged"); os.remove(os.path.join(vault, "eng/conf.upstream"))
+        git(vault, "add", "-A"); git(vault, "commit", "-qm", "merged")
+        again = upgrade(vault, "t2")
+        assert not again["conflict"] and again["kept"] == ["eng/conf", "eng/keep"] and not again["added"] and not again["deleted"], again
+        assert not os.path.exists(os.path.join(vault, "eng/miss")), "a deleted file stays deleted"
         assert lock2["files"]["eng/keep"] == lock["files"]["eng/keep"] and lock2["files"]["eng/repl"] == sha(os.path.join(vault, "eng/repl"))
         try:
             upgrade(os.path.join(t, "engine"), "t2", allow_dirty=True); raise AssertionError("no lock accepted")
@@ -191,9 +229,9 @@ def main(argv):
         if not tag or not vals:
             sys.exit(__doc__)
         values = json.load(open(vals, encoding="utf-8"))
-        for k in ("ORG", "PRODUCT"):
-            if not values.get(k):
-                sys.exit(f"engine-upgrade: {vals} is missing {k}")
+        missing = [k for k in ORG_KEYS if not values.get(k)]
+        if missing:  # they go into the lock and every later upgrade; a default would stick for good
+            sys.exit(f"engine-upgrade: {vals} is missing {', '.join(missing)}")
         report(tag, upgrade(ROOT, tag, opt("--repo"), allow, adopt_values=values), adopt=True)
     else:
         if not argv or argv[0].startswith("-"):
