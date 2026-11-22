@@ -315,8 +315,8 @@ this file don't need a bump.
 
 ## Validated against
 
-Fixture set + expected outputs: `evals/fixtures.md`. Results log:
-`evals/results.md`. 7/7 passed 2026-08-11, before wiring. Fixtures 8 (reword
+Fixture set + expected outputs: evals/fixtures.md. Results log:
+evals/results.md (both in the source vault, not shipped with the engine). 7/7 passed 2026-08-11, before wiring. Fixtures 8 (reword
 only) and 9 (source discipline) added 2026-11-22; not run yet. Fixtures test the
 diff-generation logic only, not the widget — the widget has been used live
 since 2026-08-11 but has no automated eval of its own.
@@ -325,7 +325,7 @@ since 2026-08-11 but has no automated eval of its own.
 a second pilot was dropped 2026-10-29). `daily-slack-review` no longer calls this
 directly — it hands off to `ingest`, which decides when a diff-propose call is
 needed. Current sub-move status is tracked in exactly one place —
-`1_PROJECTS/memory-system-upgrade/PLAN.md` (Move 3 section) — not restated
+the memory-system-upgrade project's PLAN.md (Move 3 section) — not restated
 here. **Session count and outcome tallies** (how many times this skill has
 actually run, and with what result) are tracked in exactly one other place —
 `diff-sessions.md`, in this same folder, appended to by `ingest` Step 4 — not

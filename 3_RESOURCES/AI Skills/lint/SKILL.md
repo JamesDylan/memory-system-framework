@@ -255,7 +255,7 @@ than improvising a tone.
 Why this sits in the judgment pass: roughly five of every six action files are
 user-owned, and nothing currently surfaces when their own commitments age out. The
 vault will report a file stale in 14 days and say nothing about a `now`-priority
-action that has not moved in five weeks. `Actions/pilot-decision-framework.md` has
+action that has not moved in five weeks. Precedent: `Actions/pilot-decision-framework.md` has
 been `now` since 8 Jul with no movement and has never been flagged by anything.
 
 **Stale target dates inside freshly-edited files.** When an initiative, owner or
