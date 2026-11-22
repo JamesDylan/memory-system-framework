@@ -9,7 +9,7 @@ This doc is the *operational* reference — when to run it, what the automation 
 
 | Phase | Who | Cost | What it catches |
 |---|---|---|---|
-| 1 — Mechanical | `.scripts/lint.mjs` | Zero agent tokens | Dead pointers, staleness vs. rhythm thresholds, missing stamps, unverified content, orphan skills, inbox age, index↔changelog drift, deployed-skill drift, what a new vault has not filled in yet |
+| 1 — Mechanical | `.scripts/lint.mjs` | Zero agent tokens | Dead pointers, staleness vs. rhythm thresholds, missing stamps, unverified content, orphan skills, inbox age, index↔changelog drift, deployed-skill drift, what a new vault has not filled in yet, engine drift |
 | 2 — Judgment | Agent (Claude), on request | Agent tokens | Single-source-of-truth conflicts, semantic staleness (dates fresh but content wrong), missing/wrong structure, 2–3 questions worth investigating next |
 
 Phase 1 runs automatically every Monday 08:00 via launchd — see Automation below. Phase 2 only runs when the owner (`_private/ME.md`) explicitly asks Claude to lint / review / do the weekly vault check.

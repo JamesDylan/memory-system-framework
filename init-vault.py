@@ -5,15 +5,17 @@ Usage:  python3 init-vault.py answers.json
         python3 init-vault.py --selftest   (builds the example into a temp folder and lints it; needs node)
 
 Reads the answers, replaces every {{PLACEHOLDER}} in file contents and file
-names, then builds the shared vault (this engine plus a PARA skeleton) and the
-private vault, and mounts the private vault in the shared one as _private/.
+names (engine files, listed in engine-files.json, get organisation values only),
+then builds the shared vault (this engine plus a PARA skeleton) and the private
+vault, mounts the private vault in the shared one as _private/, and writes
+engine.lock (engine version, organisation values, a hash of each engine file).
 Run it once, from the framework folder. It refuses to write into a folder that
 already has content.
 """
-import datetime, getpass, json, os, re, shutil, sys
+import datetime, fnmatch, getpass, hashlib, json, os, re, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SKIP = {".git", "node_modules"}
+SKIP = {".git", "node_modules", "__pycache__"}
 TEXT_EXT = (".md", ".json", ".yml", ".yaml", ".py", ".mjs", ".sh", ".plist", ".base", ".txt", ".canvas", ".js", ".toml", ".conf")
 # template -> destination, relative to the shared vault ("P:" = private vault)
 PLACE = [
@@ -30,7 +32,10 @@ PLACE = [
     ("0_INBOX/README.md", "P:0_INBOX/README.md"),
     ("templates/private-AGENTS.template.md", "P:AGENTS.md"),
 ]
-MOVE_DIRS = [("_metrics", "2_AREAS/{{ORG}}/_metrics"), ("private/3_RESOURCES/AI Skills", "P:3_RESOURCES/AI Skills")]
+ENGINE = json.load(open(os.path.join(HERE, "engine-files.json"), encoding="utf-8"))
+MOVE_DIRS = ENGINE["remap"]
+# Organisation values: filled into engine files and stored in engine.lock. Person values only go into vault content.
+ORG_KEYS = ("ORG", "ORG_LOWER", "PRODUCT", "PRODUCT_LOWER", "PRODUCT_LONG", "PARTNER", "SLACK_WORKSPACE")
 SHARED_DIRS = ["1_PROJECTS/{{ORG}}", "1_PROJECTS/Actions", "2_AREAS/{{ORG}}/context", "2_AREAS/{{ORG}}/people", "2_AREAS/{{ORG}}/_H2 Roadmap",
                "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/insights",
                "3_RESOURCES/{{ORG}}/concepts", "3_RESOURCES/processes", "4_ARCHIVE/projects"] + ["4_ARCHIVE/sources/" + d for d in ("meetings", "docs", "decks", "data", "notes")]
@@ -65,6 +70,29 @@ RAW = {
 }
 
 
+def is_engine(rel):
+    """An engine-owned file, by its path in this repo (engine-files.json). Placed templates are vault content."""
+    m = lambda pats: any(fnmatch.fnmatchcase(rel, p) for p in pats)
+    return m(ENGINE["include"]) and not m(ENGINE["exclude"]) and rel not in {s for s, _ in PLACE}
+
+
+def vault_path(rel):
+    """Where an engine file lands, before filling: the remap applied ("P:" = private vault)."""
+    for src, dst in MOVE_DIRS:
+        if rel == src or rel.startswith(src + "/"):
+            return dst + rel[len(src):]
+    return rel
+
+
+def sha256(path):
+    return hashlib.sha256(open(path, "rb").read()).hexdigest()
+
+
+def git(*args):
+    r = subprocess.run(["git", "-C", HERE, *args], capture_output=True, text=True)
+    return r.stdout.strip() if r.returncode == 0 else ""
+
+
 def stub(path, what):
     title = os.path.splitext(os.path.basename(path))[0].replace("_", " ")
     return (f"# {title[:1].upper() + title[1:]}\n\n**Last Updated:** {{{{TODAY}}}}\n**Last verified accurate:** not yet (not filled in)\n"
@@ -93,7 +121,9 @@ def main():
     for d in (shared, private):
         if os.path.isdir(d) and os.listdir(d):
             sys.exit(f"{d} is not empty. Choose an empty or new folder.")
-    fill = lambda s: re.sub(r"\{\{([A-Z_]+)\}\}", lambda m: str(a.get(m.group(1), m.group(0))), s)
+    fill = lambda s, v=a: re.sub(r"\{\{([A-Z_]+)\}\}", lambda m: str(v.get(m.group(1), m.group(0))), s)
+    orgv = {k: a[k] for k in ORG_KEYS}
+    engine = {}  # shared vault path -> True, for the lock
 
     # 1. copy the engine into the shared vault, filling names and contents
     for root, dirs, files in os.walk(HERE):
@@ -105,8 +135,13 @@ def main():
                 continue
             dst = os.path.join(shared, fill(rel))
             os.makedirs(os.path.dirname(dst), exist_ok=True)
+            vals = a
+            if is_engine(rel):  # engine files get organisation values only, so every install of a tag hashes the same
+                vals = orgv
+                if not vault_path(rel).startswith("P:"):  # shortcut: private-vault engine files are not locked; upgrade them by hand
+                    engine[fill(vault_path(rel), orgv)] = True
             if f.endswith(TEXT_EXT):
-                open(dst, "w", encoding="utf-8").write(fill(open(src, encoding="utf-8").read()))
+                open(dst, "w", encoding="utf-8").write(fill(open(src, encoding="utf-8").read(), vals))
             else:
                 shutil.copyfile(src, dst)
             shutil.copymode(src, dst)
@@ -164,14 +199,21 @@ def main():
     with open(os.path.join(shared, ".gitignore"), "a", encoding="utf-8") as g:
         g.write("\n# Private vault mount (local only, never tracked)\n/_private\n.scripts/lint-report.md\n.scripts/lint-launchd.log\n")
 
+    # 5. engine.lock: which engine version this is, its organisation values, and a hash of each engine file as installed
+    lock = {"engine": git("describe", "--tags", "--exact-match") or "dev", "repo": git("remote", "get-url", "origin"),
+            "values": orgv, "files": {p: sha256(os.path.join(shared, p)) for p in sorted(engine)}}
+    open(os.path.join(shared, "engine.lock"), "w", encoding="utf-8").write(json.dumps(lock, indent=2) + "\n")
+
     left = []
+    org_re = r"\{\{(?:" + "|".join(ORG_KEYS) + r")\}\}"  # engine files may keep person placeholders (examples)
     for root, dirs, files in os.walk(shared):
         dirs[:] = [d for d in dirs if d not in SKIP]
         for f in files:
             if f.endswith(TEXT_EXT):
                 p = os.path.join(root, f)
-                if re.search(r"\{\{(?!PLACEHOLDERS?\}\})[A-Z_]+\}\}", open(p, encoding="utf-8").read()):
-                    left.append(os.path.relpath(p, shared))
+                rel = os.path.relpath(p, shared)
+                if re.search(org_re if rel in engine else r"\{\{(?!PLACEHOLDERS?\}\})[A-Z_]+\}\}", open(p, encoding="utf-8").read()):
+                    left.append(rel)
     print(f"Shared vault:  {shared}\nPrivate vault: {private}\nMounted at:    {link}")
     if left:
         print("Placeholders still unfilled in:", *left, sep="\n  ")
@@ -196,6 +238,10 @@ def selftest():
         assert [f for f in found["amber"] if f["check"] == "run-integrity" and "never run" in f["msg"]], "never run is should-fix"
         todo = " ".join(f["msg"] for f in found["todo"])
         assert "strategic_context.md" in todo and "_ACTIVE_CYCLE.md" in todo and "_private/ME.md`: fill in Role" in todo, todo
+        assert not [f for f in found["amber"] if f["check"] == "engine-drift"], "a fresh vault has no engine drift"
+        lock = json.load(open(os.path.join(shared, "engine.lock"), encoding="utf-8"))
+        assert set(lock["values"]) == set(ORG_KEYS) and ".scripts/lint.mjs" in lock["files"] and "2_AREAS/Acme/_metrics/check_metrics.py" in lock["files"], lock["values"]
+        assert "memory_index.md" not in lock["files"] and ".scripts/lint.config.org.json" not in lock["files"], "placed templates are vault content"
         assert MARKER in open(os.path.join(shared, "2_AREAS/Acme/context/strategic_context.md"), encoding="utf-8").read()
         assert os.path.isfile(os.path.join(shared, "1_PROJECTS/Acme", a["PILOT_INITIATIVE"], "STATE.md"))
         for root, _, files in os.walk(shared):

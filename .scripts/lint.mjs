@@ -4,7 +4,8 @@
 // Runs the mechanical checks that don't need an LLM: dead pointers, staleness,
 // missing stamps, orphan skills, inbox age, index/changelog drift, deployed-skill
 // drift, run integrity (did the thing actually run), STATE field budgets, typed facts, the
-// rejection loop (repeated reason chips, PLAN S2.3) and what a new vault has not filled in yet. Costs zero
+// rejection loop (repeated reason chips, PLAN S2.3), what a new vault has not filled in yet and engine drift
+// (engine files changed since engine.lock). Costs zero
 // agent tokens. The judgment half (semantic single-source-of-truth conflicts,
 // "is this stale in meaning", what-to-think-about-next) stays with the agent —
 // see 3_RESOURCES/AI Skills/lint/SKILL.md.
@@ -18,7 +19,8 @@
 // Zero dependencies. Node 22+ (uses fs/promises, import assertions avoided).
 
 import { readFile, readdir, stat } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -182,7 +184,18 @@ function profileGaps(text) {
   return out;
 }
 // Stamp lines aside, a cycle file names its cycle with a date or a "cycle ... <number>" line.
-const cycleMissing = (text) => !/\d{4}-\d{2}-\d{2}|\bcycle\b[^\n]*\d/i.test(text.split("\n").filter((l) => !/last\s+(updated|touched|verified)|source\s+as\s+of/i.test(l)).join("\n"));
+// Check 14 helper (F1.6): compare engine files with the hashes in engine.lock. hashOf(p) is null when p is missing.
+function engineDrift(files, hashOf, exists) {
+  const out = [];
+  for (const [p, h] of Object.entries(files)) {
+    const got = hashOf(p);
+    if (got === null) out.push(["missing", p]);
+    else if (got !== h) out.push(["changed", p]);
+    if (exists(p + ".upstream")) out.push(["conflict", p + ".upstream"]);
+  }
+  return out;
+}
+const cycleMissing =(text) => !/\d{4}-\d{2}-\d{2}|\bcycle\b[^\n]*\d/i.test(text.split("\n").filter((l) => !/last\s+(updated|touched|verified)|source\s+as\s+of/i.test(l)).join("\n"));
 if (process.argv.includes("--selftest")) {
   const t = (txt) => stampsOf(txt), d = (x) => x && `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
   const ok = (c, m) => { if (!c) { console.error("selftest FAIL: " + m); process.exitCode = 1; } };
@@ -236,6 +249,8 @@ if (process.argv.includes("--selftest")) {
   ok(layerConfig(eng, null).d.join() === "1", "config: no org file means engine only");
   ok(/lint\.config\.org\.json is not valid JSON/.test((() => { try { layerConfig(eng, "{ bad"); } catch (e) { return e.message; } })()), "config: bad org JSON is an error");
   ok(/must hold a JSON object/.test((() => { try { layerConfig(eng, "[]"); } catch (e) { return e.message; } })()), "config: org file must be an object");
+  const dr = engineDrift({ a: "1", b: "2", c: "3", d: "4" }, (p) => ({ a: "1", b: "x", d: "4" })[p] ?? null, (p) => p === "d.upstream");
+  ok(JSON.stringify(dr) === JSON.stringify([["changed", "b"], ["missing", "c"], ["conflict", "d.upstream"]]), "engine-drift: changed, missing and unresolved conflict; same hash is clean");
   if (!process.exitCode) console.log("selftest ok"); process.exit();
 }
 
@@ -792,6 +807,22 @@ async function checkNotFilled() {
     add("todo", "not-filled", `\`${p}\`: ${why.join("; ")}`, (nf.profiles || []).includes(p) ? "Fill in the Value column" : `Fill it in, then delete the \`> ${nf.marker}\` line if it has one`);
   }
 }
+// ── Check 14: engine drift (F1.6) ───────────────────────────────────────────
+// engine.lock lists each engine file with its hash as installed. A changed file can't be upgraded cleanly.
+async function checkEngineDrift() {
+  const text = await readSafe(join(ROOT, "engine.lock"));
+  if (text === null) { add("green", "engine-drift", "No engine lock here (the engine repo, or a vault set up before F1.6): engine drift not checked"); return; }
+  let files;
+  try { files = JSON.parse(text).files || {}; } catch (e) { add("red", "engine-drift", `engine.lock is not valid JSON: ${e.message}`, "Restore the last good version of it"); return; }
+  const hashOf = (p) => { try { return createHash("sha256").update(readFileSync(join(ROOT, p))).digest("hex"); } catch { return null; } };
+  const found = engineDrift(files, hashOf, (p) => existsSync(join(ROOT, p)));
+  for (const [kind, p] of found) {
+    if (kind === "changed") add("amber", "engine-drift", `Engine file \`${p}\` differs from the version in engine.lock`, "Edit this upstream (engine repo), or move the change to the org layer, then restore the file");
+    else if (kind === "missing") add("amber", "engine-drift", `Engine file \`${p}\` is listed in engine.lock but missing`, "Restore it from the engine, or remove it upstream");
+    else add("amber", "engine-drift", `Unresolved upgrade conflict: \`${p}\``, "Merge it into the file beside it, then delete the .upstream file");
+  }
+  if (!found.length) add("green", "engine-drift", `${Object.keys(files).length} engine file(s) match engine.lock`);
+}
 await buildInventory();
 await checkNotFilled();
 await checkDeadPointers();
@@ -806,6 +837,7 @@ await checkPrivateBoundary();
 await checkLargeFiles();
 await checkFacts();
 await checkRejectionLoop();
+await checkEngineDrift();
 
 // ── Output ──────────────────────────────────────────────────────────────────
 const stamp = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;

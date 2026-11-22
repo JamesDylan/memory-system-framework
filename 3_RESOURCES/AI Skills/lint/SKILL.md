@@ -111,6 +111,11 @@ malformed org file stops lint with an error.
    and template text (`[name]`, `TBD`, `<your name>`) left in operational files.
    A file with the marker gets no staleness findings until the line is deleted.
    Policy is `notFilled` in `lint.config.json`.
+12. **Engine drift** (`engine-drift`, Check 14, added 2026-11-22, F1.6). Should-fix
+   for each engine file whose sha256 differs from engine.lock ("edit this upstream,
+   or move it to the org layer"), each lock-listed file that is missing, and each
+   `<file>.upstream` left by `engine-upgrade.py` (an unresolved upgrade conflict).
+   No lock (the engine repo itself, or a vault set up before F1.6): one green line.
 
 ### The `unverified` finding (added 2026-08-10)
 

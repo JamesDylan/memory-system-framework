@@ -219,7 +219,7 @@ Templates are in `templates/`.
 
 | Part | File | Does |
 |---|---|---|
-| Lint, mechanical | `.scripts/lint.mjs`, `.scripts/lint.config.json` (engine), `.scripts/lint.config.org.json` (this vault) | Dead pointers, staleness, missing stamps, orphan skills, inbox age, index drift, deployed-skill drift, run integrity, STATE budgets, private boundary. No model |
+| Lint, mechanical | `.scripts/lint.mjs`, `.scripts/lint.config.json` (engine), `.scripts/lint.config.org.json` (this vault) | Dead pointers, staleness, missing stamps, orphan skills, inbox age, index drift, deployed-skill drift, run integrity, STATE budgets, private boundary, engine drift. No model |
 | Lint, scheduled | `.scripts/daily-pull.sh` (installs one launchd job) | Daily pull, then lint, with a notification on must-fix findings (macOS) |
 | Lint, CI | `.github/workflows/lint.yml`, `.scripts/scorecard.mjs`, `.scripts/health.mjs` | Lint on each PR; weekly health row, optional agent fix PR and Slack digest. Each part is skipped until its secret is set |
 | Lint, judgment | `3_RESOURCES/AI Skills/lint/` | Conflicts and semantic staleness. Needs an agent |
@@ -244,7 +244,7 @@ cp templates/answers.example.json answers.json   # edit it
 python3 init-vault.py answers.json
 ```
 
-`init-vault.py` replaces every `{{PLACEHOLDER}}`, builds both vaults, creates the `_private` symlink and the `.gitignore` entry. Then:
+`init-vault.py` replaces every `{{PLACEHOLDER}}` (engine files get organisation values only), builds both vaults, creates the `_private` symlink and the `.gitignore` entry, and writes engine.lock at the shared vault root. Then:
 
 ```bash
 cd <shared vault>
@@ -254,6 +254,18 @@ node .scripts/lint.mjs
 ```
 
 Copy the skills you use to your agent's skills folder, or point it at `3_RESOURCES/AI Skills/`.
+
+### Upgrade the engine
+
+`engine-files.json` lists the files the engine owns. Everything else in a vault is the vault's own. engine.lock (in the vault) records the engine tag, the organisation values and a hash of each engine file as installed. Lint check `engine-drift` reports an engine file you changed: make that change in the engine repo, or move it to the org layer (`.scripts/lint.config.org.json`, seats, your own skills).
+
+```bash
+python3 .scripts/engine-upgrade.py <tag>   # from a clean git tree; --repo <url-or-path> if the lock has none
+```
+
+It installs the tag in a temp folder with your organisation values, then updates each engine file you have not changed. A file you changed stays as it is: if the engine changed it too, the new version is written beside it as `<file>.upstream` for you to merge. New engine files are added. Removed ones are listed, not deleted. It rewrites engine.lock and never commits: review the diff, run lint, commit on a branch.
+
+A vault set up before engine.lock: `python3 .scripts/engine-upgrade.py --adopt <tag> --values answers.json` writes a first lock for that tag and lists every engine file that differs from it. Private-vault engine files (`private/` here) are not in the lock yet: upgrade those by hand.
 
 ## Safety
 
