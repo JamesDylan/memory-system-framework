@@ -47,13 +47,19 @@ node .scripts/lint.mjs --json     # machine-readable (for scheduling/automation)
 node .scripts/lint.mjs --strict   # exit 1 if any 🔴 — use in cron to trigger an alert
 ```
 
-Policy lives in `.scripts/lint.config.json` (staleness rhythms/thresholds,
-verification thresholds, which operational files and path patterns are under the
-freshness check, scanned directories and recognised extensions for dead pointers,
-inbox age, skill-registration exemptions, deployed-skill mirrors). Edit that file
-to tune the checks — never hard-code policy in the script. The config carries
-`_comment` fields recording *why* each knob exists; extend them rather than
-replacing them, so a settled decision doesn't get re-litigated.
+Policy lives in two files (staleness rhythms/thresholds, verification
+thresholds, which operational files and path patterns are under the freshness
+check, scanned directories and recognised extensions for dead pointers, inbox
+age, skill-registration exemptions, deployed-skill mirrors, run-integrity jobs).
+`.scripts/lint.config.json` is the engine's: defaults, and a `_comment` on each
+knob saying what it means. `.scripts/lint.config.org.json` is this vault's own,
+and lint merges it over the engine file: objects merge key by key, and an array
+or value there replaces the engine's (to extend an engine list, copy it there and
+add to it). Put every vault-specific setting in the org file (pilot STATEs in
+`stateBudgets.strictFiles`, your own operational files, refresh contracts,
+excluded sources, deployed skills, scheduled jobs); change the engine file only
+for a default every vault should get. Never hard-code policy in the script. A
+malformed org file stops lint with an error.
 
 **What the script checks (do NOT re-do these by hand):**
 
@@ -86,9 +92,9 @@ replacing them, so a settled decision doesn't get re-litigated.
    2026-10-29) — bullets per field, words per bullet, nested bullets and an
    appended `Last touched`, against the budgets in `diff-propose/SKILL.md`.
    🔴 for diff-propose pilot files (`stateBudgets.strictFiles`), 🟡 for other `1_PROJECTS/{{ORG}}/*/STATE.md`.
-   Policy is `stateBudgets` in `lint.config.json`.
+   Policy is `stateBudgets` in the lint config; pilot `strictFiles` go in the org file.
 10. **Refresh contracts** (`source-newer`, `contract-overdue`, `contract`; in
-   Check 2, added 2026-11-20, Move 11f). `refreshContracts` in `lint.config.json`
+   Check 2, added 2026-11-20, Move 11f). `refreshContracts` in `lint.config.org.json`
    gives each slow file its source, how often the source publishes
    (`sourceEveryDays`) and who confirms the file. `source-newer`: the first date
    on the `Source as of` line is older than `sourceEveryDays` + `sourceGraceDays`,

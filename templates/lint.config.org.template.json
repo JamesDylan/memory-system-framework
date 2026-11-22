@@ -1,0 +1,25 @@
+{
+  "_comment": "This vault's own lint settings. init-vault.py puts this file at .scripts/lint.config.org.json; the vault owns it, the engine never overwrites it. lint.mjs reads the engine's .scripts/lint.config.json (defaults, and what each key means), then merges this file over it: objects merge key by key; an array or value here REPLACES the engine's. To add to an engine list (operationalFiles, operationalGlobs, deadPointerExcludeSources), copy the whole engine list here and extend it. Typical vault entries: extra operationalFiles, refreshContracts for your own sources, deadPointerExcludeSources for project folders that quote another repo's layout, skills that are yours only (skillsExemptFromRegistration), diff-propose pilot STATEs (stateBudgets.strictFiles), the skills you deploy (deployedSkillMirrors) and scheduled jobs (runIntegrity).",
+  "refreshContracts": [],
+  "skillsExemptFromRegistration": [],
+  "stateBudgets": { "strictFiles": [] },
+  "deployedSkillMirrors": [
+    {
+      "name": "daily-slack-review (claude.ai uploaded package)",
+      "mode": "pointer",
+      "vault": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
+      "deployed": "3_RESOURCES/AI Skills/daily-slack-review/DEPLOY/claude-ai-loader/SKILL.md"
+    }
+  ],
+  "runIntegrity": [
+    {
+      "name": "daily-slack-review",
+      "sourceSkill": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
+      "artifactPattern": "_slack-review.md",
+      "searchDirs": ["_private/0_INBOX", "_private/4_ARCHIVE"],
+      "weekdaysOnly": true,
+      "graceWeekdays": 1,
+      "footerRe": "Run provenance[\\s\\S]{0,120}?daily-slack-review` v([0-9]{4}-[0-9]{2}-[0-9]{2}\\.[0-9]+)"
+    }
+  ]
+}

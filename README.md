@@ -219,7 +219,7 @@ Templates are in `templates/`.
 
 | Part | File | Does |
 |---|---|---|
-| Lint, mechanical | `.scripts/lint.mjs`, `.scripts/lint.config.json` | Dead pointers, staleness, missing stamps, orphan skills, inbox age, index drift, deployed-skill drift, run integrity, STATE budgets, private boundary. No model |
+| Lint, mechanical | `.scripts/lint.mjs`, `.scripts/lint.config.json` (engine), `.scripts/lint.config.org.json` (this vault) | Dead pointers, staleness, missing stamps, orphan skills, inbox age, index drift, deployed-skill drift, run integrity, STATE budgets, private boundary. No model |
 | Lint, scheduled | `.scripts/daily-pull.sh` (installs one launchd job) | Daily pull, then lint, with a notification on must-fix findings (macOS) |
 | Lint, CI | `.github/workflows/lint.yml`, `.scripts/scorecard.mjs`, `.scripts/health.mjs` | Lint on each PR; weekly health row, optional agent fix PR and Slack digest. Each part is skipped until its secret is set |
 | Lint, judgment | `3_RESOURCES/AI Skills/lint/` | Conflicts and semantic staleness. Needs an agent |
