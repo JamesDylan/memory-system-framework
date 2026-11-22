@@ -1,8 +1,49 @@
 # Memory system framework
 
-A portable engine for a product manager's working memory. Markdown files, a few scripts and a set of agent skills. No data.
+**This repo is the engine, not a vault.** It holds the scripts, rules and AI agent skills that run a memory system. It holds no notes and no data. One setup command builds the vaults (folders of Markdown notes) that the engine runs on. That is why you don't see the `0_INBOX` … `4_ARCHIVE` folders here.
 
-This repo is a template. `init-vault.py` fills in your organisation, product and paths, then builds two vaults.
+## What it does
+
+A product manager's knowledge is spread across Slack, meetings, documents and their own head. This system gives that knowledge one home, and gives an AI agent the rules to keep it accurate.
+
+With it running, you can:
+
+- **Ask "where is project X now?"** and get one current answer, with its source, from one file.
+- **Drop in raw material** (Slack threads, meeting notes, documents). The agent files each fact in the right place and proposes changes for you to approve.
+- **Catch problems early.** A daily check finds stale pages, broken links, numbers that disagree and facts with no owner.
+- **Keep private things private.** Notes about people, your career and raw captures live in a separate vault that is never shared.
+
+## Why it works
+
+- **One fact, one file.** Each fact has exactly one home, so there is never a "which copy is right?" question. An index maps each type of fact to its file.
+- **Capture is messy; filing is deliberate.** Raw input goes to an inbox first. Only checked facts move into the real notes.
+- **The agent proposes; you approve.** Nothing important changes without a person saying yes.
+- **Checks are automatic.** Scripts check structure every day, without an AI. An agent checks meaning only when asked.
+- **Plain Markdown.** It works in Obsidian, in any editor and with any AI agent that can read files. You are not locked in.
+
+## How to use it
+
+1. **Set up once.** Run `init-vault.py` (see [Set up](#set-up)). It builds two vaults with the PARA folders (Projects, Areas, Resources, Archive):
+
+   ```text
+   memory_system/            shared vault: a git repo your team can read
+     1_PROJECTS/<Org>/       one folder per initiative: BRIEF, STATE, LOG
+     2_AREAS/<Org>/          ongoing context: strategy, people, metrics
+     3_RESOURCES/            concepts, processes, and the AI Skills (engine)
+     4_ARCHIVE/              finished work and source documents
+     _private/  ->           link to the private vault below
+
+   memory_private/           private vault: your machine only
+     0_INBOX/                every raw input lands here first
+     1_PROJECTS/Actions/     your own to-dos
+     2_AREAS/                your team, your career
+     3_RESOURCES/AI Skills/  skills that touch private data
+     4_ARCHIVE/
+   ```
+
+2. **Every day:** drop raw material in `_private/0_INBOX/`, then ask your agent to "process my inbox". The `ingest` skill files each fact and shows you the changes to approve.
+3. **When you need an answer:** ask your agent. It searches first, reads the one canonical file, and tells you if the answer may be out of date.
+4. **Every week:** read the lint report and fix what it flags.
 
 ## The model
 
