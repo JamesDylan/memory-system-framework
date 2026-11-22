@@ -9,7 +9,7 @@ This doc is the *operational* reference — when to run it, what the automation 
 
 | Phase | Who | Cost | What it catches |
 |---|---|---|---|
-| 1 — Mechanical | `.scripts/lint.mjs` | Zero agent tokens | Dead pointers, staleness vs. rhythm thresholds, missing stamps, unverified content, orphan skills, inbox age, index↔changelog drift, deployed-skill drift |
+| 1 — Mechanical | `.scripts/lint.mjs` | Zero agent tokens | Dead pointers, staleness vs. rhythm thresholds, missing stamps, unverified content, orphan skills, inbox age, index↔changelog drift, deployed-skill drift, what a new vault has not filled in yet |
 | 2 — Judgment | Agent (Claude), on request | Agent tokens | Single-source-of-truth conflicts, semantic staleness (dates fresh but content wrong), missing/wrong structure, 2–3 questions worth investigating next |
 
 Phase 1 runs automatically every Monday 08:00 via launchd — see Automation below. Phase 2 only runs when the owner (`_private/ME.md`) explicitly asks Claude to lint / review / do the weekly vault check.
@@ -54,7 +54,7 @@ Ask Claude to "lint the memory system," "run the weekly vault review," or "what'
 
 ## Reviewing Output
 
-- **Phase 1 report:** `.scripts/lint-report.md` — overwritten on every daily pull. 🔴 = must fix, 🟡 = should fix, 🟢 = healthy.
+- **Phase 1 report:** `.scripts/lint-report.md` — overwritten on every daily pull. 📝 = not filled in yet (a new vault's to-do list), 🔴 = must fix, 🟡 = should fix, 🟢 = healthy.
 - **Phase 2 report:** produced inline in the Claude conversation, in the format specified in the `lint` SKILL.md (`# Lint — Judgment Pass — [date]`). Not auto-saved anywhere — if a finding is worth keeping, it should graduate into `CHANGELOG.md` (if it's a fix) or the relevant canonical file (if it's a structural correction), not live only in chat history.
 - **macOS notification:** the daily automated run shows a `Memory lint` notification only if there is a 🔴. Treat a red notification as a same-day action item, not a someday-item — it means a pointer is dead or a canonical file is missing, which degrades every subsequent Claude session until fixed.
 
