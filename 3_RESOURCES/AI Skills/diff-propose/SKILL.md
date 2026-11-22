@@ -321,7 +321,7 @@ only) and 9 (source discipline) added 2026-11-22; not run yet. Fixtures test the
 diff-generation logic only, not the widget — the widget has been used live
 since 2026-08-11 but has no automated eval of its own.
 
-**Called by `ingest` (Step 2c)** for the pilot initiatives (the files in `stateBudgets.strictFiles`, `.scripts/lint.config.json`;
+**Called by `ingest` (Step 2c)** for the pilot initiatives (named in `ORG.md`, row "`diff-propose` pilot initiative";
 a second pilot was dropped 2026-10-29). `daily-slack-review` no longer calls this
 directly — it hands off to `ingest`, which decides when a diff-propose call is
 needed. Current sub-move status is tracked in exactly one place —

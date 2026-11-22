@@ -119,6 +119,7 @@
 
   "_stateBudgetsComment": "Field budgets for STATE files (check 8, added 2026-10-29). Mirrors diff-propose/SKILL.md 'STATE is a snapshot, not a history'; change both together. strictFiles are diff-propose pilots (vault-specific, so empty in the engine) and report must-fix; other glob matches report should-fix because they use the pre-budget schema. Word counts exclude the bullet marker.",
   "stateBudgets": {
+    "strictFiles": [],
     "globs": ["1_PROJECTS/{{ORG}}/*/STATE.md"],
     "fields": {
       "Right now": { "maxBullets": 6, "maxWords": 40 },

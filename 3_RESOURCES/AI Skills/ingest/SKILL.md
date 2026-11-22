@@ -50,7 +50,7 @@ replaces the routing judgment.
    coaching observation**, also read the **Performance-Evidence Graph** section
    of `memory_index.md` and the relevant competency notes — it may spawn an
    evidence card (Step 2b).
-5. If the input concerns **a pilot initiative** (`stateBudgets.strictFiles` in `.scripts/lint.config.json`) specifically — the Move 3
+5. If the input concerns **a pilot initiative** (named in `ORG.md`, row "`diff-propose` pilot initiative") specifically — the Move 3
    pilot initiative — also read
    `3_RESOURCES/AI Skills/diff-propose/SKILL.md`. STATE diffs for it go
    through that skill, not the ad hoc diffing in Step 3 (see Step 2c).
@@ -136,7 +136,7 @@ and the two SoT rules.
 
 ## Step 2c — Pilot initiatives: delegate STATE diffs to `diff-propose`
 
-**Scope:** the pilot initiatives listed in the lint config only. A second pilot was dropped as the
+**Scope:** the pilot initiatives named in `ORG.md` only. A second pilot was dropped as the
 second pilot on 2026-10-29 (too little signal; its STATE goes back to the
 ad hoc Step 2/3 flow). Every other initiative keeps using the ad hoc STATE
 editing in Step 2/3 above — don't expand this scope without an explicit
