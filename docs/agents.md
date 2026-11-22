@@ -97,7 +97,7 @@ Read the note it posts and the git diff it leaves. Fix the brief or the gate bef
 
 ```bash
 SEAT=<seat>; DIR="$(pwd -P)/2_AREAS/Agents/$SEAT"; PL=~/Library/LaunchAgents/com.$(whoami).$SEAT.plist
-sed -e "s#__SEAT__#$SEAT#g" -e "s#__SEATDIR__#$DIR#g" templates/seat/launchd.plist > "$PL"
+sed -e "s#__SEAT__#$SEAT#g" -e "s#__SEATDIR__#$DIR#g" -e "s#__USER__#$(whoami)#g" -e "s#__HOME__#$HOME#g" templates/seat/launchd.plist > "$PL"
 ```
 
 Edit the schedule in that file (every 15 minutes, or a time of day), then load it:

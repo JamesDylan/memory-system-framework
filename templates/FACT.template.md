@@ -25,7 +25,7 @@ as_of     The date the source states the claim (not the date you wrote this file
 verified  A date only when the fact is verified, else "not yet".
           Verified means a person checked, or a source can be pointed to directly
           (i.e. a metric, Slack message, Google Doc) that states the fact or confirms
-          it correct. ({{OWNER}}, 2026-11-22.)
+          it correct. (Decided 2026-11-22.)
           Pointable: a Slack permalink, a Google Doc/Drive link with its section, a
           metric (metric:<registry id> or a dashboard link), a Jira or Productboard
           item. Put that link or ID in source. For a person check, write

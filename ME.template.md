@@ -4,6 +4,10 @@
 
 Per-person values the skills need. Private. One file per person, never shared.
 
+## Values
+
+Engine scripts and skills read the owner's values from this table. Keep the `| Key | Value |` shape and the key names.
+
 | Key | Value |
 |---|---|
 | Name | {{OWNER_NAME}} |

@@ -85,7 +85,7 @@ replacing them, so a settled decision doesn't get re-litigated.
 9. **STATE field budgets** (`state-budget`, Check 8 in `lint.mjs`, added
    2026-10-29) — bullets per field, words per bullet, nested bullets and an
    appended `Last touched`, against the budgets in `diff-propose/SKILL.md`.
-   🔴 for diff-propose pilot files ({{PILOT}}), 🟡 for other `1_PROJECTS/{{ORG}}/*/STATE.md`.
+   🔴 for diff-propose pilot files (`stateBudgets.strictFiles`), 🟡 for other `1_PROJECTS/{{ORG}}/*/STATE.md`.
    Policy is `stateBudgets` in `lint.config.json`.
 10. **Refresh contracts** (`source-newer`, `contract-overdue`, `contract`; in
    Check 2, added 2026-11-20, Move 11f). `refreshContracts` in `lint.config.json`

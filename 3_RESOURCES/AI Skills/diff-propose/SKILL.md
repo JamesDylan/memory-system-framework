@@ -90,7 +90,7 @@ logic lives.
 
 ## STATE is a snapshot, not a history (added 2026-10-29)
 
-**Why this exists.** Over the pilot, {{PILOT}} `STATE.md` grew from 5,344 to 12,055
+**Why this exists.** Over the pilot, the pilot initiative's `STATE.md` grew from 5,344 to 12,055
 words. Every diff was a "whole-field replacement" in form, but in practice each
 `proposed_value` was the old field plus a new dated sub-bullet. Resolved risks
 stayed in place with strikethrough, and `Last touched` turned into a changelog.
@@ -118,7 +118,7 @@ those means the content belongs in `log_entry`. One exception: an item whose
 sources disagree names both (see "Source discipline").
 
 **Field budgets.** The original 200-word cap was never enforced and doesn't fit
-a programme the size of {{PILOT}}, so the budget is per field:
+a programme the size of the pilot initiative, so the budget is per field:
 
 | Field | Budget |
 |---|---|
@@ -163,7 +163,7 @@ fragment, 10/14 draft design doc, 10/27 deck), plus one Gemini mis-transcription
   only in the transcript are `inferred`; add `"transcript"` to `source_flags`.
   Gemini mishears names (8/14: "Rene" for Partner contact A).
 
-### Source discipline (added 2026-11-22, PLAN S2.6, approved by {{OWNER}})
+### Source discipline (added 2026-11-22, PLAN S2.6, approved by the owner, `_private/ME.md`)
 
 Applies to every diff, from any signal.
 
@@ -218,7 +218,7 @@ delta, not surface-level similarity.
 
   **The test, applied before every diff:** *which PM would be accountable if this went wrong?* If the answer is not the target initiative's owner, the routing is wrong — re-route or mark `unrouted`. Do not proceed on the basis that the topic sounds like the initiative.
 
-  **The incident this exists to prevent.** On 14 Aug, two of four proposed {{PILOT_INITIATIVE}} diffs were rejected by the user as misrouted, and both failed the same way. (1) The Demand API v3 excluding to/from city codes for flight, car and hotel search — belongs to search widgets, not {{PILOT}}, even though {{PILOT}} carries its own Demand API milestone. (2) New registration endpoints being slower than the BBM flow — belongs to Onboarding Personalisation, not {{PILOT}}, even though the endpoints are migration-adjacent.
+  **The incident this exists to prevent.** On 14 Aug, two of four proposed pilot-initiative diffs were rejected by the user as misrouted, and both failed the same way. (1) The Demand API v3 excluding to/from city codes for flight, car and hotel search — belongs to search widgets, not the pilot initiative, even though the pilot carries its own Demand API milestone. (2) New registration endpoints being slower than the BBM flow — belongs to Onboarding Personalisation, not the pilot, even though the endpoints are migration-adjacent.
 
   Both facts were correct and both were scored `direct`, correctly. **The confidence rubric worked; the routing rules didn't.** Signal was anchored on shared vocabulary ("Demand API", "endpoint migration") rather than on which team owns the thing being measured. Confidence tells you how good the evidence is, never whether the diff landed in the right file — do not read a `direct` tag as reassurance about placement.
 
@@ -252,7 +252,7 @@ job is parsing their reply and applying it (see the calling skill's own apply
 step — currently `ingest` Step 4).
 
 1. If `diffs` is empty: state plainly, e.g. "No STATE diffs proposed this run
-   for {{PILOT}}." Don't fabricate content to look useful.
+   for <initiative>." Don't fabricate content to look useful.
 2. If diffs exist, render them as an interactive widget, not a markdown block:
    - Call `visualize:read_me` with `modules: ["interactive"]` once per session
      before the first `visualize:show_widget` call (silently — don't narrate it).
@@ -321,8 +321,8 @@ only) and 9 (source discipline) added 2026-11-22; not run yet. Fixtures test the
 diff-generation logic only, not the widget — the widget has been used live
 since 2026-08-11 but has no automated eval of its own.
 
-**Called by `ingest` (Step 2c)** for the pilot initiative ({{PILOT}} Native
-Migration; {{SECOND_PILOT}} was dropped as the second pilot 2026-10-29). `daily-slack-review` no longer calls this
+**Called by `ingest` (Step 2c)** for the pilot initiatives (the files in `stateBudgets.strictFiles`, `.scripts/lint.config.json`;
+a second pilot was dropped 2026-10-29). `daily-slack-review` no longer calls this
 directly — it hands off to `ingest`, which decides when a diff-propose call is
 needed. Current sub-move status is tracked in exactly one place —
 `1_PROJECTS/memory-system-upgrade/PLAN.md` (Move 3 section) — not restated

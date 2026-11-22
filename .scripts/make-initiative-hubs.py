@@ -88,7 +88,7 @@ def first_match(heads: list[str], wanted: str) -> str | None:
 
 
 def build(name: str, folder: Path) -> str:
-    rel = f"1_PROJECTS/{{ORG}}/{name}"
+    rel = "1_PROJECTS/{{ORG}}/" + name  # not an f-string: it would halve the placeholder braces
     docs = [d for d in ["STATE", "BRIEF", "LOG", "OPEN_QUESTIONS", "README", "PCB"]
             if (folder / f"{d}.md").exists()]
     state_heads = headings(folder / "STATE.md")

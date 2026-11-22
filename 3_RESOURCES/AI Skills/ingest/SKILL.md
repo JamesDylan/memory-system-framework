@@ -50,7 +50,7 @@ replaces the routing judgment.
    coaching observation**, also read the **Performance-Evidence Graph** section
    of `memory_index.md` and the relevant competency notes — it may spawn an
    evidence card (Step 2b).
-5. If the input concerns **{{PILOT_INITIATIVE}}** specifically — the Move 3
+5. If the input concerns **a pilot initiative** (`stateBudgets.strictFiles` in `.scripts/lint.config.json`) specifically — the Move 3
    pilot initiative — also read
    `3_RESOURCES/AI Skills/diff-propose/SKILL.md`. STATE diffs for it go
    through that skill, not the ad hoc diffing in Step 3 (see Step 2c).
@@ -68,7 +68,7 @@ For each distinct piece of signal, decide its type and route to the ONE home:
 | If the signal is… | Route to | As |
 |---|---|---|
 | **New feature / initiative idea** (not committed) | `2_AREAS/{{ORG}}/_H2 Roadmap/CANDIDATES.md` | A candidate entry using the schema there. **Do NOT create a project folder.** |
-| **Feedback / update on an EXISTING initiative** | That initiative's `LOG.md` (always, dated) + `STATE.md` (only if it changes health, current work, next decision, or a risk) | Dated LOG entry; targeted STATE field edits. **Exception: {{PILOT_INITIATIVE}} — don't diff STATE.md yourself, see Step 2c.** LOG.md entry still happens here as normal either way. |
+| **Feedback / update on an EXISTING initiative** | That initiative's `LOG.md` (always, dated) + `STATE.md` (only if it changes health, current work, next decision, or a risk) | Dated LOG entry; targeted STATE field edits. **Exception: the pilot initiatives — don't diff STATE.md yourself, see Step 2c.** LOG.md entry still happens here as normal either way. |
 | **Decision, constraint or open question** for an initiative that has a `facts/` folder (today: Example Initiative C) | `1_PROJECTS/{{ORG}}/[Name]/facts/[type]-[slug].md` (PLAN S3.3) | New file from `3_RESOURCES/framework/templates/FACT.template.md`: `as_of` = the source's date, `source` = the original, `verified: not yet` (only the approver sets a date). A changed fact: propose a `status` change on the old file plus a new fact; never edit the old claim. Do not also write it into STATE. The LOG entry links the fact file |
 | **Roadmap / prioritisation / sequencing input** | `2_AREAS/{{ORG}}/_H2 Roadmap/ROADMAP.md` | Update relevant tier (Now/Next/Later/Not-in-H2) or open-decisions |
 | **Strategy / VOC / competitive** | `2_AREAS/{{ORG}}/context/strategic_context.md` | Targeted edit |
@@ -136,7 +136,7 @@ and the two SoT rules.
 
 ## Step 2c — Pilot initiatives: delegate STATE diffs to `diff-propose`
 
-**Scope:** {{PILOT_INITIATIVE}} only. {{SECOND_PILOT}} was dropped as the
+**Scope:** the pilot initiatives listed in the lint config only. A second pilot was dropped as the
 second pilot on 2026-10-29 (too little signal; its STATE goes back to the
 ad hoc Step 2/3 flow). Every other initiative keeps using the ad hoc STATE
 editing in Step 2/3 above — don't expand this scope without an explicit
@@ -161,8 +161,8 @@ change a STATE field:
    and applied via the normal Step 3/4 flow in parallel — the pilot delegation
    doesn't block the rest of the inbox.
 
-**Pushback:** if a STATE diff is about to be proposed ad hoc for {{PILOT}} Native
-Migration, stop — that routes around the exact mechanism
+**Pushback:** if a STATE diff is about to be proposed ad hoc for a pilot
+initiative, stop — that routes around the exact mechanism
 the pilot exists to test. Use `diff-propose` instead.
 
 ## Step 3 — Propose diffs
@@ -199,7 +199,7 @@ Once approved:
 4. Clear the inbox file(s) by **moving them to the matching type folder under `4_ARCHIVE/sources/`. Never
    delete a source** (changed 2026-10-29). Raw sources are the evidence behind
    every canonical fact. Without them a claim can't be re-checked, which is
-   what made the {{PILOT}} ground-truth audit depend on the user's memory alone.
+   what made the pilot's ground-truth audit depend on the user's memory alone.
    - Type folders: `_private/4_ARCHIVE/sources/slack/` (Slack briefs and raw signal),
      `4_ARCHIVE/sources/meetings/` (meeting notes, Gemini transcripts, 1:1s),
      `4_ARCHIVE/sources/docs/` (documents others wrote: PRDs, proposals, PCBs,
@@ -263,7 +263,7 @@ decided diff, not just rejections; without the approved/edited denominator,
 confidence-tier validity can't be computed (gap found 2026-10-29). Do this even if every diff
 was rejected, left pending, or `diffs` came back empty — a session with
 nothing applied is still a session, and undercounting these is exactly the gap
-found 2026-09-16 (the user had run diff-propose 4 times on {{PILOT}}; CHANGELOG/LOG.md
+found 2026-09-16 (the user had run diff-propose 4 times on the pilot; CHANGELOG/LOG.md
 skimming alone suggested 2). This is the one place session count is
 authoritative — don't let it silently stop being updated.
 

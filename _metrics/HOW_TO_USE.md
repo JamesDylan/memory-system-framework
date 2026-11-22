@@ -29,7 +29,8 @@ pip3 install pyyaml
 ### Step 2. Make it one word to run
 
 ```bash
-echo "alias metrics='python3 {{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/_metrics/check_metrics.py --root {{SHARED_VAULT_PATH}}'" >> ~/.zshrc
+# run from the vault root: $PWD is filled in when you run echo
+echo "alias metrics='python3 $PWD/2_AREAS/{{ORG}}/_metrics/check_metrics.py --root $PWD'" >> ~/.zshrc
 source ~/.zshrc
 ```
 

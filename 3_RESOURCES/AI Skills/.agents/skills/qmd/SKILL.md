@@ -25,7 +25,7 @@ QMD indexes the vault's markdown for keyword (BM25), semantic (vector) and hybri
    - Concepts, "how does X work", "what did we decide" → `vec`, plus `lex` with the key nouns.
    - CLI: `qmd query $'intent: …\nlex: …\nvec: …' -n 8`, or `qmd search "TICKET-123" -n 5` for keywords only.
 2. **Read** the full top hits. Fetch by the **`#docid` or `qmd://…` path that search returned** (`get` / `multi_get`). Snippets are leads, not facts.
-   - ⚠️ **Never pass a real vault path that contains a space to `qmd get`** (for example `1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/STATE.md`). qmd stores slug paths (`1-PROJECTS/{{ORG}}/{{PILOT}}-Native-Migration/STATE.md`), and an unmatched path silently fuzzy-matches **a different file**. To read a file by its real path, read it from disk instead.
+   - ⚠️ **Never pass a real vault path that contains a space to `qmd get`** (for example `1_PROJECTS/{{ORG}}/Example Initiative/STATE.md`). qmd stores slug paths (`1-PROJECTS/{{ORG}}/Example-Initiative/STATE.md`), and an unmatched path silently fuzzy-matches **a different file**. To read a file by its real path, read it from disk instead.
 3. **Answer from the canonical file**, and cite its real vault path. Convert a slug back to the real path: `-` may be `_` or a space; check on disk.
 
 ## 3. Trust rules (what makes an answer right in this vault)

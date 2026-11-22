@@ -208,8 +208,8 @@ if (isMain && process.argv.includes("--selftest")) {
   const H = "| Date | Initiative | Trigger | Proposed | Approved | Edited | Rejected | Pending | Note | Direct A/E/R | Inferred A/E/R | Versions (dp / ingest) | Reasons | Source flags |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n";
   const row = (d, init, trig, p, a, e, r, n, dir, inf, v, rs) => `| ${d} | ${init} | ${trig} | ${p} | ${a} | ${e} | ${r} | ${n} | note | ${dir} | ${inf} | ${v} | ${rs} | disagree |\n`;
   const fx = "## Sessions\n\n" + H
-    + row("2026-08-14", "{{PILOT}}", "ingest (ad hoc)", 2, 0, 0, 2, 0, "—", "—", "—", "—")
-    + row("2026-11-02", "{{PILOT}}", "daily-slack-review (x)", 4, 2, 1, 1, 0, "1/0/1", "1/1/0", "v1 / v1", "wording, wrong fact ×1")
+    + row("2026-08-14", "Pilot", "ingest (ad hoc)", 2, 0, 0, 2, 0, "—", "—", "—", "—")
+    + row("2026-11-02", "Pilot", "daily-slack-review (x)", 4, 2, 1, 1, 0, "1/0/1", "1/1/0", "v1 / v1", "wording, wrong fact ×1")
     + row("2026-11-03", "SCW", "meeting-ingest (y)", 2, 1, 1, 0, 1, "0/0/0", "1/1/0", "v1 / v1", "disagree ×2")
     + "\n## Running totals\n| a | b |\n|---|---|\n| 1 | 2 |\n";
   const rows = parseSessions(fx);

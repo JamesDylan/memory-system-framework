@@ -53,7 +53,7 @@ vault; it does not mutate canonical files. Useful connections compound back via
 ## Step 1 — Establish the anchor(s)
 
 Two modes:
-- **Two named things** ("connect {{PILOT}} migration and churn prevention") — read
+- **Two named things** ("connect the migration and churn prevention") — read
   both anchors.
 - **One thing, open-ended** ("what connects to the 5th-booking inflection") —
   read the one anchor, then let semantic search find the far side.

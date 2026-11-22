@@ -100,7 +100,7 @@ if (process.argv.includes("--selftest")) {
   assert.equal(r.asks_max, 2); assert.equal(r.asks_by_owner, "U1=2 no owner=1");
   assert.equal(csvLine(r), "2026-11-23,3,5,4,9,2,U1=2 no owner=1,60-120,,");
   assert.match(slackLine(r), /STATEs in budget 3\/5 · sources fresh 4\/9 .* truth rate — · test score —$/);
-  assert.equal(minutesFrom("| Measure | Value |\n| {{OWNER}}'s minutes per week on upkeep | **60–120** | 2026-11-22 |\n| Minutes per week (correction) | **45** | x |"), "45");
+  assert.equal(minutesFrom("| Measure | Value |\n| Owner's minutes per week on upkeep | **60–120** | 2026-11-22 |\n| Minutes per week (correction) | **45** | x |"), "45");
   assert.equal(minutesFrom("no table"), "");
   assert.throws(() => row({ date: "d", findings: { red: [], amber: [], green: [] } }, ""), /format change/);
   console.log("selftest ok");

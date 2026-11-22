@@ -117,7 +117,7 @@ Proceed only for a concrete reason (a blocker, a deadline).
 
 1. **Read the step in PLAN.md and the v2 sections it cites.** Do not work from memory.
 2. **Write a detailed plan for the step** in STATE or the PR description before you change files. Answer the step's **Open** questions in it. Name the files you will touch.
-3. **Get approval when the Owner line asks for it** (for example, "{{OWNER}} approves deletions"). Otherwise, say what you will do and do it unless the user stops you.
+3. **Get approval when the Owner line asks for it** (for example, "the owner approves deletions"). Otherwise, say what you will do and do it unless the user stops you.
 4. **Verify after every significant change.** Read what you wrote. Run lint (`.scripts/`) when you changed links or structure.
 5. **One file at a time for big edits.** Check each one before the next.
 6. **Small commits.** One step per branch and PR where you can.

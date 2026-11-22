@@ -11,7 +11,7 @@ seconds, exactly which file and line has drifted.
 
 Usage
     python3 check_metrics.py                          # check the vault
-    python3 check_metrics.py --root {{SHARED_VAULT_PATH}}
+    python3 check_metrics.py --root <vault root>
     python3 check_metrics.py --set churn.company.annual=18.4
     python3 check_metrics.py --set acq.registered_companies.weekly=1200 --asof 2026-09-04
     python3 check_metrics.py --set id1=v1 --set id2=v2 --asof 2026-09-04   # weekly batch;
