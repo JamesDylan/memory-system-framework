@@ -8,7 +8,7 @@ You can run all of it by hand, one prompt at a time, and add agents one job at a
 
 > **This repo is the engine, not a vault.** It holds the scripts, rules, agent skills and agent templates. It holds no notes and no data. One setup command builds the vaults (folders of plain Markdown notes) that the engine runs on.
 >
-> **The agent layer is running in the author's private vault today** and moves into this repo shortly. Here now: the skills, the checks, CI and the template for a scheduled agent (`templates/seat/`). Coming across: the running agents, the dispatcher and the eval harness. See [What runs today](#what-runs-today).
+> **The agent layer is here.** The scheduled agents, the dispatcher and the evals are in `2_AREAS/Agents/`. Each one runs in the author's vault. To set them up on your own machine, follow **[docs/agents.md](docs/agents.md)**, or hand that guide to your agent.
 
 ## Why use it
 
@@ -82,11 +82,11 @@ Each seat also has its own model (the cheapest one that passes), a turn limit, a
 
 **Replies start work.** Every item an agent posts has an address (`D1` diff, `A1` action, `U1` unrouted). A reply such as `U1: project <Name>` becomes a job file. One dispatcher agent runs the job with its own tool list and replies in the thread. A new kind of follow-up is a new formula, not a new agent.
 
-`templates/seat/` and `templates/seat-brief.md` build a new seat. `templates/laws-audit.md` is the safety check a seat passes before it goes on a clock.
+**[docs/agents.md](docs/agents.md)** covers setup (tokens, secrets, the clock), day-to-day running, evals and building a new seat from `templates/seat/`.
 
 ### What runs today
 
-In the author's private vault, moving here shortly:
+All in `2_AREAS/Agents/`. Status is from the author's own vault:
 
 | Agent | Job | Status |
 |---|---|---|
@@ -120,7 +120,7 @@ Three parts work together. None is rebuilt by the others.
 | Part | Gives | Where |
 |---|---|---|
 | **The memory system** | Shared facts, one home each, with sources and stamps | This engine, and the vaults it builds |
-| **The agents (seats)** | Work on a clock, with hard limits, locks and evals | Private vault today; this repo shortly |
+| **The agents (seats)** | Work on a clock, with hard limits, locks and evals | `2_AREAS/Agents/` in this engine |
 | **The pipelines** | Discovery, PCB, one-pager and PRD stages, a prototype kit and a "twin" of the product on made-up data | The team's discovery lab repo |
 
 Joined, they work like this:
@@ -140,7 +140,7 @@ The order is fixed by evidence: each stage starts when the one before it shows a
 |---|---|---|---|
 | **Measure** | Baseline cost and time per task; weekly health numbers; skill scorecards; typed, sourced facts | You can see whether the system is getting more accurate and cheaper | Mostly done |
 | **Project harness pilot** | One project where facts come from listed sources, not hand copies. Specs sync from Drive. A weekly truth check | Answers follow the live spec, and accuracy is a number, not a feeling | In progress |
-| **Next agents** | `truth-check` (truth rate for the pilot), `state-refresh` (stale project pages refreshed from Slack and tickets), `spec-sync` (Drive copies kept current). Agent layer moves into this repo | Project pages stay current without anyone copying status by hand | Next |
+| **Next agents** | `truth-check` (truth rate for the pilot), `state-refresh` (stale project pages refreshed from Slack and tickets), `spec-sync` (Drive copies kept current) | Project pages stay current without anyone copying status by hand | Next |
 | **Pipelines** | One stage template with its own checks and evals. Memory upkeep, discovery and the experiment loop rebuilt as stages and run as seats | Discovery starts from what the team knows, and costs less per run | Planned |
 | **Active layer** | New projects start from a template and a baseline. "Help me write the PRD" routes to the right pipeline in any AI tool. Process gates checked in CI, with a visible skip | No project starts from a blank page | Planned |
 | **Scale and automate** | Every live project on the harness. All agents maintain the vault through PRs. Routine facts auto-apply once proven safe. Changed skills replayed against past sessions before they go live. Monthly pruning | A week passes with no manual run, and the system gets simpler as it grows | Planned |
@@ -228,7 +228,7 @@ Templates are in `templates/`.
 | Capture | `daily-slack-review`, `watch` | Pull signal into the inbox |
 | Route | `ingest`, `diff-propose` | Classify, propose, apply, log |
 | Think | `second-brain`, `challenge`, `emerge`, `connect`, `calibrate`, `review-prep`, `debloat` | Read the vault for a purpose |
-| Automate | `templates/seat/`, `templates/seat-brief.md`, `templates/laws-audit.md` | A scheduled agent with one job, its own model, cost cap, tool list and write folder. Posts a short note for a person to approve |
+| Automate | `2_AREAS/Agents/` (seats, dispatcher, evals), `templates/seat/` (incl. `launchd.plist`), `templates/seat-brief.md`, `templates/laws-audit.md`. Guide: [docs/agents.md](docs/agents.md) | Scheduled agents with one job each, their own model, cost cap, tool list and write folder. Each posts a short note for a person to approve |
 | Publish | `.scripts/export-framework.py` | Export the engine with no organisation data |
 
 `watch`, `calibrate` and `debloat` ship in `private/` and install into the private vault (`_private/3_RESOURCES/AI Skills/`), because they read or write private data.
@@ -265,7 +265,7 @@ Copy the skills you use to your agent's skills folder, or point it at `3_RESOURC
 ## Limits
 
 - Built and used by one person so far. A shared team vault is set up; use by a second PM is the next test.
-- The running agents, dispatcher and evals are in the author's private vault and not yet in this repo. Here today: the seat template and the CI checks. Project harnesses and pipelines are partly built or planned. The [Roadmap](#roadmap) says which.
+- The agents are exported from one person's vault. Secrets, the launchd clock and a Slack app are set up per person ([docs/agents.md](docs/agents.md)). Project harnesses and pipelines are partly built or planned. The [Roadmap](#roadmap) says which.
 - Seats run on one person's Mac today (launchd). Where they run for a team is still open.
 - Skill text keeps its design history. Names of people, projects and systems were replaced with placeholders, so some examples read as generic.
 - The scheduled lint job is macOS only.

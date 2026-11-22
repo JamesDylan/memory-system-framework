@@ -1,0 +1,10 @@
+{
+ "id": "nothing-new",
+ "title": "A meeting that only repeats what STATE already says",
+ "plain": "From the 'already true' rule. Nothing new against STATE and LOG: no LOG entry and no diff, but still a pending file and a note.",
+ "in_name": "2026-11-17-eos-migration-sync.txt",
+ "expect": {
+  "logs": [],
+  "diffs_max": 0
+ }
+}

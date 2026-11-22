@@ -1,0 +1,27 @@
+Meeting: Program Update: {{PILOT_INITIATIVE}}
+Start: 2026-11-20T11:00:00+13:00
+Attendees: owner@example.com, craig.newman@example.com, keith.smith@example.com, arjun.rao@example.com
+Source: Program Update: {{PILOT_INITIATIVE}} - 2026/11/19 22:00 GMT - Notes by Gemini
+
+📝 Notes
+Nov 19, 2026
+Program Update: {{PILOT_INITIATIVE}}
+Invited {{OWNER_NAME}} the engineering lead Newman Engineer A Smith Arjun Rao
+
+Quick notes
+Summary
+The experiment launch moves from 1 December to 8 December. The ETL is at about 74% and still on track to finish on 22 November.
+
+Full notes
+Decisions
+ALIGNED
+Experiment launch date: {{OWNER_NAME}} said "we're moving the experiment launch to 8 December, that's decided", to give a full week for replay acceptance after 27 November.
+
+Details
+ETL progress: Engineer A Smith reported 1,014,000 of 1,370,440 orgs done (about 74%). Finish on 22 November is still on track.
+Launch date: the engineering lead Newman asked whether 1 December was still realistic. {{OWNER_NAME}} moved the experiment launch to 8 December. the engineering lead agreed.
+Dead letters: Arjun Rao said the count is unchanged at 136.
+
+Next steps
+[{{OWNER_NAME}}] Tell the company hierarchy and support teams the new launch date.
+[Engineer A Smith] Report ETL completion on 22 November.

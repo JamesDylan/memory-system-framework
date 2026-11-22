@@ -1,0 +1,23 @@
+{
+ "id": "tokenisation-stale",
+ "title": "Tokenisation decided in a payments meeting, but the project STATE is stale",
+ "plain": "From hand run 2. Tokenisation goes to {{PRODUCT}} PCI Scope. That STATE was last touched 27 Jul, so it adds a LOG entry, proposes no diff and puts the facts in 'unrouted' as stale.",
+ "in_name": "2026-11-19-checkout-payments-weekly.txt",
+ "expect": {
+  "projects_include": [
+   "{{PRODUCT}} PCI Scope"
+  ],
+  "logs": [
+   "{{PRODUCT}} PCI Scope"
+  ],
+  "no_diff_for": [
+   "{{PRODUCT}} PCI Scope"
+  ],
+  "unrouted_reason_contains": [
+   "stale"
+  ],
+  "log_contains": [
+   "2026-11-19"
+  ]
+ }
+}

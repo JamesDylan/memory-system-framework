@@ -1,0 +1,22 @@
+{
+ "id": "scope-change-full-field",
+ "title": "A launch date moves while Right now is full (6 of 6 bullets)",
+ "plain": "From hand runs 2 and 3. A date change is a STATE diff marked needs_james, never only 'unrouted', and the diff stays within the 6-bullet limit.",
+ "in_name": "2026-11-20-eos-native-migration-program-update.txt",
+ "expect": {
+  "projects_include": [
+   "{{PILOT_INITIATIVE}}"
+  ],
+  "needs_james_for": [
+   "{{PILOT_INITIATIVE}}"
+  ],
+  "diffs_any_contains": [
+   "8 Dec",
+   "8 December",
+   "December 8"
+  ],
+  "log_contains": [
+   "2026-11-20"
+  ]
+ }
+}

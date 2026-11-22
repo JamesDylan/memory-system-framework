@@ -1,0 +1,14 @@
+{
+ "id": "no-project-folder",
+ "title": "A vendor demo with no project folder, and actions for {{OWNER}}",
+ "plain": "From hand run 3 (Merge.dev). It creates no project folder and invents no STATE diff; the meeting goes to 'unrouted' as 'no project folder', and {{OWNER}}'s actions are listed for him.",
+ "in_name": "2026-11-18-receiptly-expense-capture-demo.txt",
+ "expect": {
+  "logs": [],
+  "diffs_max": 0,
+  "unrouted_reason_contains": [
+   "no project folder",
+   "action for {{OWNER}}"
+  ]
+ }
+}

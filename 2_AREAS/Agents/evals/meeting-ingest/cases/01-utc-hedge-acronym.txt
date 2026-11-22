@@ -1,0 +1,27 @@
+Meeting: Example Initiative B Rel3 - F6 Move members between groups
+Start: 2026-11-17T09:30:00+13:00
+Attendees: owner@example.com, jordan.avery@example.com, priya.nair@example.com, tom.fielding@example.com, board-room@resource.calendar.google.com
+Source: Example Initiative B Rel3 - F6 Move members between groups - 2026/11/16 20:30 GMT - Notes by Gemini
+
+📝 Notes
+Nov 16, 2026
+Example Initiative B Rel3 - F6 Move members between groups
+Invited {{OWNER_NAME}} Jordan Avery Priya Nair Tom Fielding
+
+Quick notes
+Summary
+The team decided that moving a member between groups will halt if the OPA (Open Policy Agent) token check times out. Moves run one member at a time.
+
+Full notes
+Decisions
+NEEDS FURTHER DISCUSSION
+Move behaviour on token timeout: Priya Nair said a move would "probably be retried once" if the OPA token check times out after the Soul sync; not confirmed. Tom Fielding to check.
+
+Details
+Move flow: Tom Fielding explained the move is one call per member. The admin selects members, picks a target group, and the button shows loading until all calls return.
+Token check: the OPA token is checked on each call. Priya Nair said it could "probably be retried once" if the check times out; nobody confirmed. Someone in Board Room asked whether the Soul member record is updated at the same time; Priya said it is updated through dual-write.
+Error messages: Jordan Avery will ask for an error state when part of a move fails, the same as F5.
+
+Next steps
+[Tom Fielding] Confirm what happens on an OPA token timeout during a move.
+[Jordan Avery] Add the partial-failure error state to the F6 requirements.

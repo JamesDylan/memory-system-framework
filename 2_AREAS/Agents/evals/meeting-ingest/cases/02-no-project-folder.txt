@@ -1,0 +1,27 @@
+Meeting: Receiptly expense capture demo
+Start: 2026-11-18T14:00:00+13:00
+Attendees: owner@example.com, ravi.menon@example.com, sales@receiptly.example.com
+Source: Receiptly expense capture demo - 2026/11/18 01:00 GMT - Notes by Gemini
+
+📝 Notes
+Nov 18, 2026
+Receiptly expense capture demo
+Invited {{OWNER_NAME}} Ravi Menon Receiptly Sales
+
+Quick notes
+Summary
+Receiptly demoed receipt capture by photo and email forwarding for business travellers. Pricing is per active user. The team will look at a trial.
+
+Full notes
+Decisions
+NEEDS FURTHER DISCUSSION
+Trial: {{OWNER_NAME}} said a trial is "worth a look" but no decision until security review.
+
+Details
+Product: Receiptly reads hotel and taxi receipts from a photo or a forwarded email and matches them to a card transaction. It exports to Xero and MYOB.
+Pricing: the Receiptly sales lead quoted $4 per active user per month, with a 60-day free trial.
+Fit: Ravi Menon asked if it could attach receipts to {{PRODUCT}} bookings; Receiptly said there is an API but no travel booking integration yet.
+
+Next steps
+[{{OWNER_NAME}}] Send the Receiptly security questionnaire to the vendor by Friday 20 Nov.
+[{{OWNER_NAME}}] Decide with Ravi whether to run the 60-day trial.

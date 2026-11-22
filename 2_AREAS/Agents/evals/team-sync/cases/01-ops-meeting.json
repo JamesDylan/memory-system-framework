@@ -1,0 +1,16 @@
+{
+ "id": "ops-meeting",
+ "title": "A Fortnightly Ops meeting with three real topics and five kinds of noise",
+ "plain": "{{OWNER}}'s own example (18 Nov). The summary keeps the three topics and the deck link, finds PM B behind Gemini's 'Jackie', lists only the two owned actions, and leaves out initiative detail, a performance remark, a hedge, an injection and logistics.",
+ "in_name": "2026-11-18-{{PRODUCT_LOWER}}-product-team-fortnightly-ops-meeting.txt",
+ "expect": {
+  "topics_min": 3,
+  "topics_max": 4,
+  "topics_contain_each": [["Productboard"], ["intake"], ["PCB"]],
+  "links_include": ["https://docs.google.com/presentation/d/1AbCdEfGhIjK/edit"],
+  "action_owners": ["All", "{{OWNER}}"],
+  "actions_max": 2,
+  "anywhere_contains": ["PM B"],
+  "anywhere_excludes": ["Jackie", "22 November", "below the standard", "below standard", "actions are complete", "Level 3", "Board Room"]
+ }
+}

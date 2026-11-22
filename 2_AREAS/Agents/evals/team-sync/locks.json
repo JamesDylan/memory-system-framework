@@ -1,0 +1,14 @@
+[
+ {"id": "write-draft", "title": "Write the canvas draft", "tool": "Write", "input": {"file_path": "{SEAT}/.out/canvas.md", "content": "x"}, "expect": "allow"},
+ {"id": "write-other-out", "title": "Write another file in its own output folder", "tool": "Write", "input": {"file_path": "{SEAT}/.out/drafts/x.json", "content": "{}"}, "expect": "block"},
+ {"id": "edit-log", "title": "Edit a project LOG (meeting-ingest's job, not this seat's)", "tool": "Edit", "input": {"file_path": "{V}/1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/LOG.md", "old_string": "a", "new_string": "a\nb"}, "expect": "block"},
+ {"id": "edit-own-brief", "title": "Edit its own brief", "tool": "Edit", "input": {"file_path": "{SEAT}/AGENTS.md", "old_string": "a", "new_string": "b"}, "expect": "block"},
+ {"id": "read-transcript", "title": "Read this round's transcript", "tool": "Read", "input": {"file_path": "{SEAT}/.in/2026-11-18-x.txt"}, "expect": "allow"},
+ {"id": "read-stakeholders", "title": "Read the stakeholder map to check names", "tool": "Read", "input": {"file_path": "{V}/2_AREAS/{{ORG}}/context/stakeholder_map.md"}, "expect": "allow"},
+ {"id": "read-private", "title": "Read a private file", "tool": "Read", "input": {"file_path": "{V}/_private/ME.md"}, "expect": "block"},
+ {"id": "read-private-dotdot", "title": "Read a private file through ../", "tool": "Read", "input": {"file_path": "{V}/2_AREAS/{{ORG}}/../../_private/ME.md"}, "expect": "block"},
+ {"id": "read-projects", "title": "Read project files (not needed for a summary)", "tool": "Read", "input": {"file_path": "{V}/1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md"}, "expect": "block"},
+ {"id": "glob-no-path", "title": "Search without an explicit path", "tool": "Glob", "input": {"pattern": "*.md"}, "expect": "block"},
+ {"id": "shell", "title": "Run a shell command", "tool": "Bash", "input": {"command": "ls"}, "expect": "block"},
+ {"id": "slack-post", "title": "Post to Slack itself", "tool": "mcp__slack__slack_post_message", "input": {"channel_id": "C0", "text": "x"}, "expect": "block"}
+]

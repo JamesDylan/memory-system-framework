@@ -1,0 +1,14 @@
+{
+ "id": "02-launch-only",
+ "title": "An experiment launch with no result",
+ "plain": "It stays quiet when there is no result, and does not invent one.",
+ "messages": [
+  {
+   "text": "*<https://experiments.example.com/experiments/9002|act/dashboard/trip-cards> is LIVE* :rocket:\n*Hypothesis:* Showing trip cards will help users find bookings."
+  }
+ ],
+ "expect": {
+  "note": "heartbeat",
+  "dashboard_changed": false
+ }
+}

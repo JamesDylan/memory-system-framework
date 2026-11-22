@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Read(/{{SHARED_VAULT_PATH}}/1_PROJECTS/**)",
+      "Read(/{{SHARED_VAULT_PATH}}/2_AREAS/**)",
+      "Read(/{{SHARED_VAULT_PATH}}/3_RESOURCES/**)",
+      "Edit(/{{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/insights/*.md)",
+      "Edit(/{{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/_metrics/.experiment-reporter-last-ts)",
+      "Edit(/{{SHARED_VAULT_PATH}}/2_AREAS/Agents/experiment-reporter/.out/note.txt)",
+      "Bash(/usr/bin/python3 {{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/_metrics/check_metrics.py:*)",
+      "mcp__qmd__query", "mcp__qmd__get", "mcp__qmd__multi_get", "mcp__qmd__status",
+      "mcp__slack__slack_get_channel_history",
+      "mcp__slack__slack_get_thread_replies"
+    ],
+    "deny": [
+      "Read(/{{SHARED_VAULT_PATH}}/**/_private/**)",
+      "Read(/{{SHARED_VAULT_PATH}}/_private/**)",
+      "Read(/{{SHARED_VAULT_PATH}}/4_ARCHIVE/**)",
+      "WebFetch", "WebSearch", "Agent", "Workflow"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write|MultiEdit|Bash|mcp__slack__.*",
+        "hooks": [{ "type": "command", "command": "/usr/bin/python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.py\"" }]
+      }
+    ]
+  }
+}

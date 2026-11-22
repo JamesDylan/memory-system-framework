@@ -1,0 +1,14 @@
+{
+ "id": "05-already-recorded",
+ "title": "A result already on the dashboard",
+ "plain": "It does not add the same result twice.",
+ "messages": [
+  {
+   "text": ":100: The *Invite your travel arranger* experiment for self-bookers is full-on\n*The Impact:*\n\u2022 *+9.5 bookings/day* (10.4 : 1 odds in favor of variant)\n\u2022 *3.5%* of new self-bookers clicked \"Send Invite\"\n*The Takeaway:* Scoping the prompt strictly to onboarding drove more engagement."
+  }
+ ],
+ "expect": {
+  "note": "heartbeat",
+  "dashboard_changed": false
+ }
+}

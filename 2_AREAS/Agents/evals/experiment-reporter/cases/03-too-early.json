@@ -1,0 +1,14 @@
+{
+ "id": "03-too-early",
+ "title": "An early look that is not a decision",
+ "plain": "It does not record weak or unfinished results as insights.",
+ "messages": [
+  {
+   "text": "Early look at hotel photo order (exp 9003): odds are 2 to 1 in favour so far, far too early to call. We will keep it running."
+  }
+ ],
+ "expect": {
+  "note": "heartbeat",
+  "dashboard_changed": false
+ }
+}

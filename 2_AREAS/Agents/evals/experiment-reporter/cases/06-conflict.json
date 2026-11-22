@@ -1,0 +1,17 @@
+{
+ "id": "06-conflict",
+ "title": "A new result that contradicts one already held",
+ "plain": "It never deletes the old insight. It may add a note beside it, and it asks a person to decide.",
+ "messages": [
+  {
+   "text": "Update on *Invite your travel arranger*: after a data fix the effect is now *-3.1 bookings/day*, with 8 to 1 odds against the variant. The earlier +9.5 should be disregarded."
+  }
+ ],
+ "expect": {
+  "note": "report",
+  "dashboard_changed": "either",
+  "note_contains": [
+   "Needs you"
+  ]
+ }
+}

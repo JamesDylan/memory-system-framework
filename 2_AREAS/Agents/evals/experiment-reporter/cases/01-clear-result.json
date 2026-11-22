@@ -1,0 +1,18 @@
+{
+ "id": "01-clear-result",
+ "title": "A clear full-on result with numbers",
+ "plain": "It records a strong, well-sourced result and reports it in the agreed three lines.",
+ "messages": [
+  {
+   "text": "*<https://experiments.example.com/experiments/9001|obe/checkout/date-prefill> is going FULL ON* :rocket:\n*Result:* Bayes analysis shows *8.7 to 1 odds* in favour of the variant, projecting *+14.2 bookings per day*.\n*Hypothesis:* Prefilling the check-in date for returning users will reduce friction at checkout."
+  }
+ ],
+ "expect": {
+  "note": "report",
+  "dashboard_changed": true,
+  "dashboard_added_contains": [
+   "14.2",
+   "8.7"
+  ]
+ }
+}

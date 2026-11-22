@@ -1,0 +1,28 @@
+Meeting: Checkout & Payments weekly
+Start: 2026-11-19T10:00:00+13:00
+Attendees: owner@example.com, mia.torres@example.com, leo.park@example.com, sam.okoro@example.com
+Source: Checkout & Payments weekly - 2026/11/18 21:00 GMT - Notes by Gemini
+
+📝 Notes
+Nov 18, 2026
+Checkout & Payments weekly
+Invited {{OWNER_NAME}} Mia Torres Leo Park Sam Okoro
+
+Quick notes
+Summary
+The team agreed to tokenise cards for companies active in the last 12 months (about 155,000 cards). The bulk run with TokenEx is booked for 2 February.
+
+Full notes
+Decisions
+ALIGNED
+Tokenisation scope: Mia Torres said "we are going with the 12-month active scenario, that's decided"; about 155,000 cards.
+Bulk run date: Mia Torres confirmed TokenEx has booked the bulk tokenisation run for 2 February.
+
+Details
+Scope: Leo Park re-ran the numbers. The 12-month active filter gives about 155,000 cards; the 18-month filter gives about 171,000. Mia Torres chose 12 months.
+Vendor: TokenEx confirmed the bulk run date of 2 February and a cost estimate of $18,000 for the run.
+Rollout plan: Mia Torres will share the written rollout plan next week.
+
+Next steps
+[Mia Torres] Share the tokenisation rollout plan.
+[Leo Park] Send the final card list to TokenEx by 15 January.

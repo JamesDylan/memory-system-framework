@@ -1,0 +1,26 @@
+{
+ "id": "utc-hedge-acronym",
+ "title": "Example Initiative B R3 meeting: UTC date, a dropped hedge, a wrong acronym expansion",
+ "plain": "From hand run 3. It uses the NZ start date, follows the Full notes over the Quick notes, marks nothing 'direct' that was not decided, and does not state Gemini's 'Open Policy Agent' expansion as fact. Next steps owned by others, and hedged remarks, are not actions for {{OWNER}}.",
+ "in_name": "2026-11-17-company-hierarchy-rel3-f6-move-members.txt",
+ "expect": {
+  "projects_include": [
+   "{{PILOT_INITIATIVE}}"
+  ],
+  "log_contains": [
+   "2026-11-17"
+  ],
+  "log_excludes": [
+   "## 2026-11-16"
+  ],
+  "no_direct": true,
+  "unattributed_excludes": [
+   "Open Policy Agent"
+  ],
+  "actions_exclude": [
+   "retried",
+   "token timeout",
+   "error state"
+  ]
+ }
+}

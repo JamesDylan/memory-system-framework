@@ -1,0 +1,17 @@
+{
+ "id": "04-no-size",
+ "title": "A full-on decision with no effect size",
+ "plain": "It records the decision but says the size is missing, and does not make a number up.",
+ "messages": [
+  {
+   "text": "We are going full on with the Trip Card Redesign experiment :tada: The Bayes analysis was positive and the team agreed to ship."
+  }
+ ],
+ "expect": {
+  "note": "report",
+  "dashboard_changed": true,
+  "note_contains": [
+   "size not stated"
+  ]
+ }
+}

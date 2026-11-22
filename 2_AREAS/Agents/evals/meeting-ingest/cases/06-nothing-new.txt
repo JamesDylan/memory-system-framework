@@ -1,0 +1,26 @@
+Meeting: {{PILOT}} migration sync
+Start: 2026-11-17T15:00:00+13:00
+Attendees: owner@example.com, keith.smith@example.com, grace.holt@example.com
+Source: {{PILOT}} migration sync - 2026/11/17 02:00 GMT - Notes by Gemini
+
+📝 Notes
+Nov 17, 2026
+{{PILOT}} migration sync
+Invited {{OWNER_NAME}} Engineer A Smith Grace Holt
+
+Quick notes
+Summary
+A short recap. The ETL finish date of 22 November is locked. Traveler profiles will not move from LegacySystem. Nothing new was decided.
+
+Full notes
+Decisions
+No new decisions.
+
+Details
+ETL: Engineer A Smith repeated that the finish date of 22 November is locked and replay acceptance is 27 November.
+Dead letters: still 136, with 29 needing recovery.
+Traveler profiles: Grace Holt repeated that profiles will not move from LegacySystem; {{PILOT}} fills name and email from member records.
+Phase 2: {{OWNER_NAME}} repeated that a multi-country company moves as one legal entity.
+
+Next steps
+No new actions.
