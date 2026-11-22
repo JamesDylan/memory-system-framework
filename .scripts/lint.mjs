@@ -137,10 +137,11 @@ function factIssues(text, fc = cfg.facts, now = today) {
 }
 // Check 13 helpers (F1.3). The marker is a whole line (or ends a `#` comment), so a doc quoting it inline is not a stub.
 const nf = cfg.notFilled || {};
-const MARKER_RE = nf.marker ? new RegExp(`^(?:>|#.*)\\s*${nf.marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "m") : null;
+const MARKER_RE = nf.marker ? new RegExp(`^(?:#.*)?>\\s*${nf.marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "m") : null;
 const isStub = (text) => !!MARKER_RE?.test(text);
 // The first template text (cfg.notFilled.patterns) left in a file, else null.
 function templateText(text, patterns = nf.patterns || []) {
+  text = text.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "").replace(/^\[[^\]\n]+\]:\s.*$/gm, ""); // code and reference-link definitions are never template text
   for (const p of patterns) { const m = text.match(new RegExp(p)); if (m) return m[0]; }
   return null;
 }
@@ -199,6 +200,8 @@ if (process.argv.includes("--selftest")) {
   ok(!chipRule(parseSessions(ses(["duplicate ×3"], ...Array(10).fill(["—"])))).length, "rejection loop: only the last 10 sessions count");
   ok(isStub("# X\n\nWhat goes here.\n\n> Not filled in yet.\n") && isStub("# Open actions. > Not filled in yet.\nfilters:\n"), "not-filled: marker line in md and in a .base comment");
   ok(!isStub("Stubs end with `> Not filled in yet.` until filled."), "not-filled: marker quoted inline is not a stub");
+  ok(!isStub("## Budget — Not filled in yet.\n"), "not-filled: a heading ending in the marker words is not a stub");
+  ok(!templateText("See [design doc][prd].\n\n[prd]: https://x\n\n```\narr[index]\n```\nUse `<file path>`."), "not-filled: reference links and code are not template text");
   ok(templateText("**Owner:** [name] | **Health:** [critical|at_risk]") === "[name]" && templateText("- [date]: [event]") === "[date]", "not-filled: bracketed slots");
   ok(templateText("Owner: TBD") === "TBD" && templateText("Empty. Fills as material is ingested.") && templateText("Ask <your name>") === "<your name>", "not-filled: TBD, empty note, angle slot");
   ok(templateText("See [the doc](x.md), [[wiki note]], - [x] done, line<br>break, [PB-12]") === null, "not-filled: links, wikilinks, checkboxes, html and IDs are not slots");
@@ -382,7 +385,7 @@ async function checkStaleness() {
     if (SHARED && path.startsWith(PRIV(cfg) + "/")) continue;
     const text = await readSafe(join(ROOT, path));
     if (text === null) { add("red", "dead-pointer", `Operational file \`${path}\` (staleness policy) is missing`, "Fix path in lint.config.json or restore file"); continue; }
-    if (isStub(text)) continue; // a stub has nothing to be stale; Check 13 lists it under not filled in yet
+    if (isStub(text) && !stampsOf(text).verified) continue; // a never-verified stub has nothing to be stale; Check 13 lists it. Once verified, a forgotten marker no longer hides staleness.
     if (isPaused(text)) { paused++; continue; }
     const threshold = cfg.stalenessThresholdsDays[rhythm];
     // The registry has no prose stamps: its newest per-metric as_of is both its edit and its confirmation date.

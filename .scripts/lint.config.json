@@ -145,7 +145,7 @@
   "_notFilledComment": "F1.3 (2026-11-22). Check 13 not-filled: what a new vault still has to fill in, reported in its own section (JSON findings.todo), never as must-fix or should-fix. A file with the marker line (a whole line `> Not filled in yet.`, or a `#` comment ending in it) skips the staleness checks and is listed here instead. patterns are template text, checked in operational files only. profiles: Key | Value tables whose blank, (set X) or {{X}} values are listed by key. cycleFile: listed when it names no cycle and no dates.",
   "notFilled": {
     "marker": "Not filled in yet.",
-    "patterns": ["Empty\\. Fills as material is ingested\\.", "<placeholder>", "<[a-z]+(?:[ _-][a-z]+)+>", "\\bTBD\\b", "(?<!\\[)\\[(?:[a-z][a-z |/_-]+|YYYY-MM-DD)\\](?!\\(|\\])"],
+    "patterns": ["Empty\\. Fills as material is ingested\\.", "<placeholder>", "<[a-z]+(?:[ _-][a-z]+)+>", "\\bTBD\\b", "(?<!\\[|\\])\\[(?:[a-z][a-z |/_-]+|YYYY-MM-DD)\\](?!\\(|\\]|\\[)"],
     "profiles": ["ORG.md", "_private/ME.md"],
     "cycleFile": "1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md",
     "skip": ["templates/**"]
