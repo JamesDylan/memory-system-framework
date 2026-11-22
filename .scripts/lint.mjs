@@ -3,8 +3,8 @@
 //
 // Runs the mechanical checks that don't need an LLM: dead pointers, staleness,
 // missing stamps, orphan skills, inbox age, index/changelog drift, deployed-skill
-// drift, run integrity (did the thing actually run), STATE field budgets, typed facts and the
-// rejection loop (repeated reason chips, PLAN S2.3). Costs zero
+// drift, run integrity (did the thing actually run), STATE field budgets, typed facts, the
+// rejection loop (repeated reason chips, PLAN S2.3) and what a new vault has not filled in yet. Costs zero
 // agent tokens. The judgment half (semantic single-source-of-truth conflicts,
 // "is this stale in meaning", what-to-think-about-next) stays with the agent —
 // see 3_RESOURCES/AI Skills/lint/SKILL.md.
@@ -49,7 +49,8 @@ function globToRe(pattern) {
   return new RegExp(`^${body}$`);
 }
 
-const findings = { red: [], amber: [], green: [] };
+// todo = "not filled in yet" (Check 13): its own section and JSON key, so red/amber consumers (CI, health) ignore it.
+const findings = { red: [], amber: [], green: [], todo: [] };
 const add = (sev, check, msg, fix) => findings[sev].push({ check, msg, fix });
 
 const today = new Date();
@@ -134,6 +135,32 @@ function factIssues(text, fc = cfg.facts, now = today) {
   const unsourced = !errors.length && v && fc.verifiedPointer && !new RegExp(fc.verifiedPointer).test(f.source || "");
   return { errors, stale, unsourced: !!unsourced };
 }
+// Check 13 helpers (F1.3). The marker is a whole line (or ends a `#` comment), so a doc quoting it inline is not a stub.
+const nf = cfg.notFilled || {};
+const MARKER_RE = nf.marker ? new RegExp(`^(?:>|#.*)\\s*${nf.marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "m") : null;
+const isStub = (text) => !!MARKER_RE?.test(text);
+// The first template text (cfg.notFilled.patterns) left in a file, else null.
+function templateText(text, patterns = nf.patterns || []) {
+  for (const p of patterns) { const m = text.match(new RegExp(p)); if (m) return m[0]; }
+  return null;
+}
+// Keys in a `| Key | Value |` table whose value is blank, "-", or still holds "(set X)" or "{{X}}".
+function profileGaps(text) {
+  const out = [];
+  let inTable = false;
+  for (const line of text.split("\n")) {
+    if (/^\|\s*Key\s*\|\s*Value\s*\|/.test(line)) { inTable = true; continue; }
+    if (!inTable) continue;
+    if (!line.startsWith("|")) { inTable = false; continue; }
+    const [, key, val = ""] = line.split("|").map((c) => c.trim());
+    if (!key || /^:?-+:?$/.test(key)) continue;
+    const v = val.replace(/`/g, "").trim();
+    if (!v || v === "-" || /\(set [A-Z_]+\)|\{\{[A-Z_]+\}\}/.test(v)) out.push(key);
+  }
+  return out;
+}
+// Stamp lines aside, a cycle file names its cycle with a date or a "cycle ... <number>" line.
+const cycleMissing = (text) => !/\d{4}-\d{2}-\d{2}|\bcycle\b[^\n]*\d/i.test(text.split("\n").filter((l) => !/last\s+(updated|touched|verified)|source\s+as\s+of/i.test(l)).join("\n"));
 if (process.argv.includes("--selftest")) {
   const t = (txt) => stampsOf(txt), d = (x) => x && `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
   const ok = (c, m) => { if (!c) { console.error("selftest FAIL: " + m); process.exitCode = 1; } };
@@ -170,6 +197,15 @@ if (process.argv.includes("--selftest")) {
   ok(!chipRule(parseSessions(ses(["wrong fact ×2"], ["wording"], ["none ×5"]))).length, "rejection loop: 2 of a chip, or `none`, does not fire");
   ok(!chipRule(parseSessions(ses(["duplicate"], ["duplicate", "v2 / v1"], ["duplicate", "v3 / v1"]))).length, "rejection loop: counts per version only");
   ok(!chipRule(parseSessions(ses(["duplicate ×3"], ...Array(10).fill(["—"])))).length, "rejection loop: only the last 10 sessions count");
+  ok(isStub("# X\n\nWhat goes here.\n\n> Not filled in yet.\n") && isStub("# Open actions. > Not filled in yet.\nfilters:\n"), "not-filled: marker line in md and in a .base comment");
+  ok(!isStub("Stubs end with `> Not filled in yet.` until filled."), "not-filled: marker quoted inline is not a stub");
+  ok(templateText("**Owner:** [name] | **Health:** [critical|at_risk]") === "[name]" && templateText("- [date]: [event]") === "[date]", "not-filled: bracketed slots");
+  ok(templateText("Owner: TBD") === "TBD" && templateText("Empty. Fills as material is ingested.") && templateText("Ask <your name>") === "<your name>", "not-filled: TBD, empty note, angle slot");
+  ok(templateText("See [the doc](x.md), [[wiki note]], - [x] done, line<br>break, [PB-12]") === null, "not-filled: links, wikilinks, checkboxes, html and IDs are not slots");
+  const me = "| Key | Value |\n|---|---|\n| Name | Sam Example |\n| Role | |\n| Slack user ID | `(set OWNER_SLACK_ID)` |\n| Product | Widgets ({{PRODUCT_LONG}}) |\n| Level | 1 |\n\n| Who | Why |\n|---|---|\n| | |\n";
+  ok(profileGaps(me).join() === "Role,Slack user ID,Product", "not-filled: unfilled ME/ORG fields listed by name");
+  ok(cycleMissing("# Active Cycle\n\n**Last Updated:** 2026-11-22 | **Last verified accurate:** not yet\n**Cycle:** (name), (start) to (end)\n"), "not-filled: cycle file with stamps only has no cycle");
+  ok(!cycleMissing("**Cycle:** C5, 2026-10-06 to 2026-11-14") && !cycleMissing("# Active Cycle — Cycle 5"), "not-filled: named or dated cycle is filled");
   if (!process.exitCode) console.log("selftest ok"); process.exit();
 }
 
@@ -324,14 +360,18 @@ async function checkDeadPointers() {
 }
 
 // ── Check 2: staleness + missing stamps ─────────────────────────────────────
-async function checkStaleness() {
-  // Explicit files plus anything matching an operationalGlob (project STATE files etc).
+// Explicit files plus anything matching an operationalGlob (project STATE files etc).
+function operationalTargets() {
   const targets = new Map();
   for (const { path, rhythm } of cfg.operationalFiles) targets.set(path, rhythm);
   for (const { pattern, rhythm } of cfg.operationalGlobs || []) {
     const re = globToRe(pattern);
     for (const p of VAULT_PATHS) if (re.test(p) && !targets.has(p)) targets.set(p, rhythm);
   }
+  return targets;
+}
+async function checkStaleness() {
+  const targets = operationalTargets();
 
   const contracts = new Map((cfg.refreshContracts || []).map((c) => [c.path, c]));
   for (const p of contracts.keys()) if (!targets.has(p)) add("red", "contract", `Refresh contract names \`${p}\`, which is not an operational file`, "Add it to operationalFiles with a rhythm, or fix the path");
@@ -342,6 +382,7 @@ async function checkStaleness() {
     if (SHARED && path.startsWith(PRIV(cfg) + "/")) continue;
     const text = await readSafe(join(ROOT, path));
     if (text === null) { add("red", "dead-pointer", `Operational file \`${path}\` (staleness policy) is missing`, "Fix path in lint.config.json or restore file"); continue; }
+    if (isStub(text)) continue; // a stub has nothing to be stale; Check 13 lists it under not filled in yet
     if (isPaused(text)) { paused++; continue; }
     const threshold = cfg.stalenessThresholdsDays[rhythm];
     // The registry has no prose stamps: its newest per-metric as_of is both its edit and its confirmation date.
@@ -538,7 +579,8 @@ async function checkRunIntegrity() {
     }
 
     if (!newest) {
-      add("red", "run-integrity", `No \`${job.name}\` output found anywhere in ${(job.searchDirs || []).join(", ")} — the pipeline has produced nothing, ever, or its output is being written somewhere unexpected`, "Run the skill manually and confirm where it writes");
+      // Never run is should-fix: a new vault has no output yet. Late or stale output (below) stays must-fix.
+      add("amber", "run-integrity", `\`${job.name}\` has never run: no output in ${(job.searchDirs || []).join(", ")}. Either it has not been run yet, or it writes somewhere unexpected`, "Run the skill once and confirm where it writes");
       continue;
     }
 
@@ -694,7 +736,34 @@ async function checkRejectionLoop() {
   for (const h of hits) add("amber", "rejection-loop", `Reason chip \`${h.chip}\` occurs ${h.count} times in the last ${h.window} sessions of skill version ${h.version}: ${h.sessions.join("; ")}`, "Propose one change to the diff-propose or ingest rules that stops this chip. The owner (`_private/ME.md`) approves it like any diff; never edit the skill in the same pass");
   if (!hits.length) add("green", "rejection-loop", "No reason chip occurs 3+ times in the last 10 sessions of any skill version");
 }
+// ── Check 13: not filled in yet (F1.3) ─────────────────────────────────────
+// A new vault's to-do list: profile fields, the cycle file, stubs, and template text left in operational files.
+async function checkNotFilled() {
+  const todo = new Map();
+  const note = (p, why) => todo.set(p, [...(todo.get(p) || []), why]);
+  const priv = (p) => SHARED && p.startsWith(PRIV(cfg) + "/");
+  for (const p of nf.profiles || []) {
+    const text = priv(p) ? null : await readSafe(join(ROOT, p));
+    const gaps = text === null ? [] : profileGaps(text);
+    if (gaps.length) note(p, `fill in ${gaps.join(", ")}`);
+  }
+  const cycle = nf.cycleFile && await readSafe(join(ROOT, nf.cycleFile));
+  if (cycle && cycleMissing(cycle)) note(nf.cycleFile, "no cycle name or dates");
+  const skip = (nf.skip || []).map(globToRe);
+  const ops = operationalTargets();
+  for (const p of [...VAULT_PATHS].sort()) {
+    if (!/\.(md|base)$/.test(p) || priv(p) || skip.some((re) => re.test(p))) continue;
+    const text = await readSafe(join(ROOT, p));
+    if (!text) continue;
+    if (isStub(text)) note(p, "still the starter text");
+    else if (ops.has(p)) { const t = templateText(text); if (t) note(p, `template text left: \`${t}\``); }
+  }
+  for (const [p, why] of todo) {
+    add("todo", "not-filled", `\`${p}\`: ${why.join("; ")}`, (nf.profiles || []).includes(p) ? "Fill in the Value column" : `Fill it in, then delete the \`> ${nf.marker}\` line if it has one`);
+  }
+}
 await buildInventory();
+await checkNotFilled();
 await checkDeadPointers();
 await checkStaleness();
 await checkOrphanSkills();
@@ -726,10 +795,11 @@ if (AS_JSON) {
     : "";
   let out = `# Lint Report (mechanical${SHARED ? ", shared checks only" : ""}) — ${stamp}\n`;
   out += `\n_Deterministic checks only. Run the \`lint\` skill's judgment pass for single-source-of-truth conflicts, semantic staleness, and what-to-investigate-next._\n`;
+  out += section("📝 Not filled in yet — do these first", findings.todo);
   out += section("🔴 Must fix", findings.red);
   out += section("🟡 Should fix", findings.amber);
   out += section("🟢 Healthy", findings.green);
-  out += `\n---\n_Summary: ${findings.red.length} must-fix · ${findings.amber.length} should-fix · ${findings.green.length} healthy._\n`;
+  out += `\n---\n_Summary: ${findings.red.length} must-fix · ${findings.amber.length} should-fix · ${findings.green.length} healthy · ${findings.todo.length} not filled in yet._\n`;
   out += `\n**Judgment pass (needs the agent — not checked here):** single-source-of-truth conflicts (same fact, two files, different values) · semantic staleness (dates fresh but content wrong) · orphan/missing structure · 2–3 questions worth investigating next.\n`;
   console.log(out);
 }

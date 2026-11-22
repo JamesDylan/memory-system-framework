@@ -96,6 +96,15 @@ replacing them, so a settled decision doesn't get re-litigated.
    `contract-overdue`: `Last verified accurate` is "not yet" or older than the
    file's verification window. The finding names the confirmer. A contracted file
    gets these findings in place of the plain staleness and `unverified` ones.
+11. **Not filled in yet** (`not-filled`, Check 13, added 2026-11-22, F1.3). A
+   new vault's to-do list, in its own report section ("📝 Not filled in yet — do
+   these first") and JSON key (`findings.todo`): never must-fix or should-fix, so
+   CI and `health.mjs` ignore it. It lists blank or `(set X)` fields in the
+   `| Key | Value |` tables of `ORG.md` and `_private/ME.md`, a cycle file with no
+   cycle name or dates, every file with the stub marker line (`> Not filled in yet.`),
+   and template text (`[name]`, `TBD`, `<your name>`) left in operational files.
+   A file with the marker gets no staleness findings until the line is deleted.
+   Policy is `notFilled` in `lint.config.json`.
 
 ### The `unverified` finding (added 2026-08-10)
 

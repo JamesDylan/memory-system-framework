@@ -77,37 +77,13 @@
     "_private/1_PROJECTS/shared-repo-cutover/**"
   ],
   "excludeDirs": [".git", ".claude", ".obsidian", "4_ARCHIVE", "node_modules"],
-  "_deployedSkillMirrorsComment": "The vault lints itself, but nothing checked the skill copies that actually execute. DECIDED 2026-08-12: the vault is the source of truth for deployed skills. Two deployment surfaces exist and they need different checks, which is why each entry carries a mode. mode=copy means the deployed file should be byte-identical to the vault source (Claude Code, which reads real files off disk). mode=pointer means the deployed file is a thin loader that must NOT contain the skill body at all \u2014 it only has to name the vault path, so divergence is structurally impossible; used for claude.ai, where the deployed copy is an uploaded package with no readable path on this machine and therefore can never be diffed. An unreadable mirror reports amber, not silence. See 1_PROJECTS/Actions/deployed-skill-copies-diverged-from-vault.md.",
+  "_deployedSkillMirrorsComment": "The vault lints itself, but nothing checked the skill copies that actually execute. DECIDED 2026-08-12: the vault is the source of truth for deployed skills. Two deployment surfaces exist and they need different checks, which is why each entry carries a mode. mode=copy means the deployed file should be byte-identical to the vault source (Claude Code, which reads real files off disk). mode=pointer means the deployed file is a thin loader that must NOT contain the skill body at all \u2014 it only has to name the vault path, so divergence is structurally impossible; used for claude.ai, where the deployed copy is an uploaded package with no readable path on this machine and therefore can never be diffed. An unreadable mirror reports amber, not silence. See 1_PROJECTS/Actions/deployed-skill-copies-diverged-from-vault.md. F1.3 (2026-11-22): the engine lists only in-vault loaders. A user-scope copy (~/.claude/skills/<name>/SKILL.md, mode copy) belongs to the machine, and may come from another vault, so a fresh vault listing one went red on any machine with other skills. Add copy entries once this vault deploys its skills.",
   "deployedSkillMirrors": [
-    {
-      "name": "daily-slack-review (Claude Code, user scope)",
-      "mode": "copy",
-      "vault": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
-      "deployed": "~/.claude/skills/daily-slack-review/SKILL.md"
-    },
-    {
-      "name": "ingest (Claude Code, user scope)",
-      "mode": "copy",
-      "vault": "3_RESOURCES/AI Skills/ingest/SKILL.md",
-      "deployed": "~/.claude/skills/ingest/SKILL.md"
-    },
-    {
-      "name": "diff-propose (Claude Code, user scope)",
-      "mode": "copy",
-      "vault": "3_RESOURCES/AI Skills/diff-propose/SKILL.md",
-      "deployed": "~/.claude/skills/diff-propose/SKILL.md"
-    },
     {
       "name": "daily-slack-review (claude.ai uploaded package)",
       "mode": "pointer",
       "vault": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
       "deployed": "3_RESOURCES/AI Skills/daily-slack-review/DEPLOY/claude-ai-loader/SKILL.md"
-    },
-    {
-      "name": "ask-pilot (claude.ai uploaded package)",
-      "mode": "pointer",
-      "vault": "3_RESOURCES/AI Skills/ask-pilot/SKILL.md",
-      "deployed": "3_RESOURCES/AI Skills/ask-pilot/DEPLOY/claude-ai-loader/SKILL.md"
     }
   ],
 
@@ -164,5 +140,14 @@
     "maxKB": 50,
     "dirs": ["1_PROJECTS", "2_AREAS"],
     "allow": ["**/Artefacts/**", "**/sources/**", "**/LOG.md"]
+  },
+
+  "_notFilledComment": "F1.3 (2026-11-22). Check 13 not-filled: what a new vault still has to fill in, reported in its own section (JSON findings.todo), never as must-fix or should-fix. A file with the marker line (a whole line `> Not filled in yet.`, or a `#` comment ending in it) skips the staleness checks and is listed here instead. patterns are template text, checked in operational files only. profiles: Key | Value tables whose blank, (set X) or {{X}} values are listed by key. cycleFile: listed when it names no cycle and no dates.",
+  "notFilled": {
+    "marker": "Not filled in yet.",
+    "patterns": ["Empty\\. Fills as material is ingested\\.", "<placeholder>", "<[a-z]+(?:[ _-][a-z]+)+>", "\\bTBD\\b", "(?<!\\[)\\[(?:[a-z][a-z |/_-]+|YYYY-MM-DD)\\](?!\\(|\\])"],
+    "profiles": ["ORG.md", "_private/ME.md"],
+    "cycleFile": "1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md",
+    "skip": ["templates/**"]
   }
 }

@@ -185,9 +185,15 @@ def selftest():
         json.dump(a, open(os.path.join(t, "answers.json"), "w"))
         subprocess.run([sys.executable, __file__, os.path.join(t, "answers.json")], check=True, stdout=subprocess.DEVNULL)
         shared = os.path.join(t, "shared")
-        out = subprocess.run(["node", ".scripts/lint.mjs", "--json"], cwd=shared, capture_output=True, text=True).stdout
-        bad = [f["msg"] for f in json.loads(out)["findings"]["red"] if f["check"] in ("dead-pointer", "state-budget")]
-        assert not bad, bad
+        home = os.path.join(t, "home")  # empty HOME, as in CI: no installed skills to compare with
+        os.makedirs(home)
+        out = subprocess.run(["node", ".scripts/lint.mjs", "--json"], cwd=shared, capture_output=True, text=True, env={**os.environ, "HOME": home}).stdout
+        found = json.loads(out)["findings"]
+        assert not found["red"], [f["msg"] for f in found["red"]]  # a new vault has nothing must-fix
+        assert not [f for f in found["amber"] if "strategic_context.md" in f["msg"]], "a stub is listed as not filled in, not should-fix"
+        assert [f for f in found["amber"] if f["check"] == "run-integrity" and "never run" in f["msg"]], "never run is should-fix"
+        todo = " ".join(f["msg"] for f in found["todo"])
+        assert "strategic_context.md" in todo and "_ACTIVE_CYCLE.md" in todo and "_private/ME.md`: fill in Role" in todo, todo
         assert MARKER in open(os.path.join(shared, "2_AREAS/Acme/context/strategic_context.md"), encoding="utf-8").read()
         assert os.path.isfile(os.path.join(shared, "1_PROJECTS/Acme", a["PILOT_INITIATIVE"], "STATE.md"))
         for root, _, files in os.walk(shared):
