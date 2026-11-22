@@ -37,5 +37,5 @@ No clock of its own. meeting-ingest's `run.sh` calls `../dispatcher/run.sh` ever
 - [x] The job is one sentence.
 - [x] Run by hand once. 2026-11-20, "Example Project" ({{PRODUCT}} Leads thread): 3 files and a good note, no hook blocks. Faults, fixed in code: the hub script needed Python 3.10 (launchd uses 3.9), and `finish` broke on a relative job path. The job took all 6 unrouted items, because that old thread had no `U` IDs, but the model used only the 2 that were relevant.
 - [ ] Laws audit. Note: job context comes from a transcript (untrusted); the verb and the name come only from `SEAT_OWNER_ID`.
-- [ ] Eval cases in ../evals/dispatcher/ (not made yet).
+- [ ] Eval cases in evals/ (not made yet).
 - [x] Ceiling: `MAX_TURNS=30`, `MAX_BUDGET_USD=2` per job.
