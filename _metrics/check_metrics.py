@@ -123,8 +123,11 @@ def live_lines(lines, ignore_sections):
     punish exactly the audit trail we want people to keep.
     """
     pats = [re.compile(p, re.I) for p in (ignore_sections or [])]
-    skipping_section, skip_level, fenced = False, 0, False
+    skipping_section, skip_level, fenced, code = False, 0, False, False
     for ln, text in enumerate(lines, 1):
+        if text.lstrip().startswith("```"):  # markers inside code blocks are examples, not live copies
+            code = not code
+            continue
         if FENCE_OFF_RE.search(text):
             fenced = False
             continue
@@ -139,7 +142,7 @@ def live_lines(lines, ignore_sections):
             if any(p.search(title) for p in pats):
                 skipping_section, skip_level = True, level
                 continue
-        if fenced or skipping_section or IGNORE_LINE_RE.search(text):
+        if code or fenced or skipping_section or IGNORE_LINE_RE.search(text):
             continue
         yield ln, text
 
@@ -403,6 +406,8 @@ def selftest(reg_path):
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d) / "registry.yaml"
         shutil.copy(reg_path, tmp)
+        if not (yaml.safe_load(tmp.read_text(encoding="utf-8")) or {}).get("metrics"):  # a new vault: test on a sample metric
+            tmp.write_text("metrics:\n  - id: sample.metric\n    value: '1'\n    unit: count\n    as_of: 2001-01-01\n", encoding="utf-8")
         mid = yaml.safe_load(tmp.read_text(encoding="utf-8"))["metrics"][0]["id"]
         old, stamped = set_value(tmp, mid, "12,345", "2001-02-03", "selftest")
         m = {x["id"]: x for x in yaml.safe_load(tmp.read_text(encoding="utf-8"))["metrics"]}[mid]
@@ -417,6 +422,7 @@ def selftest(reg_path):
     assert stale("weekly", 15) == ["stale"] and stale("weekly", 10) == []
     assert stale("monthly", 41) == ["stale"] and stale("annual", 99) == []
     assert stale("fortnightly", 20, fallback=19) == ["stale"]
+    assert [ln for ln, _ in live_lines(["a", "```", "19% <!--m:x-->", "```", "b"], [])] == [1, 5], "code blocks skipped"
     assert valid_set_expr("a.b=18.4") and not valid_set_expr("a.b=abc") and not valid_set_expr("a.b")
     print("selftest ok")
     return 0
