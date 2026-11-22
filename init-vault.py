@@ -23,6 +23,7 @@ PLACE = [
     ("templates/slack-channels.template.md", "3_RESOURCES/{{ORG}}/{{ORG}} Slack Channels.md"),
     ("templates/metrics-registry.template.yaml", "2_AREAS/{{ORG}}/_metrics/registry.yaml"),
     ("templates/qmd-index.template.yml", ".scripts/qmd/index.yml"),
+    ("templates/lint.config.org.template.json", ".scripts/lint.config.org.json"),
     ("templates/qmd-collection.template.yml", "P:qmd-collection.yml"),
     ("ORG.template.md", "ORG.md"),
     ("ME.template.md", "P:ME.md"),
@@ -36,7 +37,7 @@ SHARED_DIRS = ["1_PROJECTS/{{ORG}}", "1_PROJECTS/Actions", "2_AREAS/{{ORG}}/cont
 PRIVATE_DIRS = ["0_INBOX", "1_PROJECTS/Actions", "2_AREAS/{{ORG}}/My Team", "2_AREAS/{{ORG}}/context", "2_AREAS/Career/Competencies",
                 "2_AREAS/Career/Evidence", "3_RESOURCES", "4_ARCHIVE/sources/slack", "4_ARCHIVE/sources/other"]
 # Files the index, skills and lint point at that a new vault has no content for yet: path -> what goes there.
-# Every operationalFiles path in .scripts/lint.config.json is stubbed too. "> Not filled in yet." is the
+# Every operationalFiles path in the lint config (engine, or the vault's lint.config.org.json) is stubbed too. "> Not filled in yet." is the
 # marker lint uses to list what to fill in next; keep it exact.
 MARKER = "> Not filled in yet."
 STUBS = {
@@ -131,7 +132,8 @@ def main():
 
     # 3b. stubs, so nothing the index, skills or lint name is missing
     cfg = json.load(open(os.path.join(shared, ".scripts/lint.config.json"), encoding="utf-8"))
-    for f in cfg.get("operationalFiles", []):
+    org = json.load(open(os.path.join(shared, ".scripts/lint.config.org.json"), encoding="utf-8"))
+    for f in org.get("operationalFiles", cfg.get("operationalFiles", [])):  # a top-level array in the org file replaces the engine's, as in lint.mjs
         p = f["path"]
         p = "P:" + p[len("_private/"):] if p.startswith("_private/") else p
         if p.endswith(".md") and p not in STUBS:

@@ -23,7 +23,7 @@ node .scripts/lint.mjs --json     # machine-readable
 node .scripts/lint.mjs --strict   # exit 1 if any 🔴 finding (used by the cron wrapper)
 ```
 
-Policy (staleness and verification thresholds, which files and path patterns are checked, scanned dirs and recognised extensions for dead pointers, inbox age, skill exemptions, deployed-skill mirrors) lives in `.scripts/lint.config.json` — edit that, never hard-code policy into the script. The config carries `_comment` fields recording why each knob exists; extend them rather than replacing them.
+Policy lives in the engine's `.scripts/lint.config.json` and this vault's `.scripts/lint.config.org.json`, merged; which setting goes in which file is in `3_RESOURCES/AI Skills/lint/SKILL.md`. Never hard-code policy into the script.
 
 ## Coverage — what Phase 1 actually scans (revised 2026-08-10)
 

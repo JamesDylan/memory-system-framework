@@ -32,7 +32,28 @@ const STRICT = args.has("--strict");
 const SHARED = args.has("--shared");
 const PRIV = (cfg) => cfg.privateBoundary?.mount || "_private";
 
-const cfg = JSON.parse(await readFile(join(ROOT, ".scripts/lint.config.json"), "utf8"));
+// F1.4: the engine owns lint.config.json; the vault's own settings live in lint.config.org.json, merged over it.
+// Objects merge key by key; an array or value in the org file replaces the engine one.
+const ORG_CFG = ".scripts/lint.config.org.json";
+const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+const mergeConfig = (base, over) => {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(over)) out[k] = isObj(v) && isObj(base[k]) ? mergeConfig(base[k], v) : v;
+  return out;
+};
+function layerConfig(engineText, orgText) {
+  const engine = JSON.parse(engineText);
+  if (orgText === null) return engine;
+  let org;
+  try { org = JSON.parse(orgText); } catch (e) { throw new Error(`${ORG_CFG} is not valid JSON: ${e.message}`); }
+  if (!isObj(org)) throw new Error(`${ORG_CFG} must hold a JSON object`);
+  return mergeConfig(engine, org);
+}
+let cfg;
+try {
+  cfg = layerConfig(await readFile(join(ROOT, ".scripts/lint.config.json"), "utf8"),
+    existsSync(join(ROOT, ORG_CFG)) ? await readFile(join(ROOT, ORG_CFG), "utf8") : null);
+} catch (e) { console.error(`lint: ${e.message}`); process.exit(2); }
 
 // Extensions that count as a vault artefact reference. Configurable so adding a
 // new artefact type (html walkthroughs, csv exports) needs no code change — the
@@ -209,6 +230,12 @@ if (process.argv.includes("--selftest")) {
   ok(profileGaps(me).join() === "Role,Slack user ID,Product", "not-filled: unfilled ME/ORG fields listed by name");
   ok(cycleMissing("# Active Cycle\n\n**Last Updated:** 2026-11-22 | **Last verified accurate:** not yet\n**Cycle:** (name), (start) to (end)\n"), "not-filled: cycle file with stamps only has no cycle");
   ok(!cycleMissing("**Cycle:** C5, 2026-10-06 to 2026-11-14") && !cycleMissing("# Active Cycle — Cycle 5"), "not-filled: named or dated cycle is filled");
+  const eng = JSON.stringify({ a: { b: 1, c: [1, 2] }, d: [1], e: "x", _note: "engine" });
+  const lay = layerConfig(eng, JSON.stringify({ a: { c: [3] }, d: [], f: 2, _note: "org" }));
+  ok(lay.a.b === 1 && lay.a.c.join() === "3" && lay.d.length === 0 && lay.e === "x" && lay.f === 2 && lay._note === "org", "config: objects merge, arrays and values replace");
+  ok(layerConfig(eng, null).d.join() === "1", "config: no org file means engine only");
+  ok(/lint\.config\.org\.json is not valid JSON/.test((() => { try { layerConfig(eng, "{ bad"); } catch (e) { return e.message; } })()), "config: bad org JSON is an error");
+  ok(/must hold a JSON object/.test((() => { try { layerConfig(eng, "[]"); } catch (e) { return e.message; } })()), "config: org file must be an object");
   if (!process.exitCode) console.log("selftest ok"); process.exit();
 }
 
@@ -384,7 +411,7 @@ async function checkStaleness() {
   for (const [path, rhythm] of targets) {
     if (SHARED && path.startsWith(PRIV(cfg) + "/")) continue;
     const text = await readSafe(join(ROOT, path));
-    if (text === null) { add("red", "dead-pointer", `Operational file \`${path}\` (staleness policy) is missing`, "Fix path in lint.config.json or restore file"); continue; }
+    if (text === null) { add("red", "dead-pointer", `Operational file \`${path}\` (staleness policy) is missing`, "Fix path in the lint config or restore file"); continue; }
     if (isStub(text) && !stampsOf(text).verified) continue; // a never-verified stub has nothing to be stale; Check 13 lists it. Once verified, a forgotten marker no longer hides staleness.
     if (isPaused(text)) { paused++; continue; }
     const threshold = cfg.stalenessThresholdsDays[rhythm];
@@ -508,7 +535,7 @@ async function checkDeployedSkills() {
   if (SHARED) return; // deployed copies live on the user's machine
   const mirrors = cfg.deployedSkillMirrors || [];
   if (!mirrors.length) {
-    add("amber", "deployed-skill", "No `deployedSkillMirrors` configured — nothing verifies that deployed skill copies match their vault source", "Add mirror paths to lint.config.json, or record the decision that the vault is documentation only");
+    add("amber", "deployed-skill", "No `deployedSkillMirrors` configured — nothing verifies that deployed skill copies match their vault source", "Add mirror paths to lint.config.org.json, or record the decision that the vault is documentation only");
     return;
   }
   let matched = 0;
@@ -516,7 +543,7 @@ async function checkDeployedSkills() {
     const a = await readSafe(join(ROOT, vault));
     const dep = deployed.replace(/^~(?=\/)/, homedir());
     const b = await readSafe(dep.startsWith("/") ? dep : join(ROOT, dep));
-    if (a === null) { add("red", "deployed-skill", `Vault source for \`${name}\` missing at \`${vault}\``, "Fix the path in lint.config.json"); continue; }
+    if (a === null) { add("red", "deployed-skill", `Vault source for \`${name}\` missing at \`${vault}\``, "Fix the path in the lint config"); continue; }
     if (b === null) { add("amber", "deployed-skill", `Deployed copy of \`${name}\` not readable at \`${deployed}\` — cannot verify it matches the vault`, "Check the mirror path, or drop the entry if the copy is unreachable by design"); continue; }
 
     if (mode === "pointer") {
@@ -563,7 +590,7 @@ async function checkRunIntegrity() {
   for (const job of cfg.runIntegrity || []) {
     if (SHARED && (job.searchDirs || []).every((d) => d.startsWith(PRIV(cfg)))) continue;
     const src = await readSafe(join(ROOT, job.sourceSkill));
-    if (src === null) { add("red", "run-integrity", `Source skill for \`${job.name}\` missing at \`${job.sourceSkill}\``, "Fix the path in lint.config.json"); continue; }
+    if (src === null) { add("red", "run-integrity", `Source skill for \`${job.name}\` missing at \`${job.sourceSkill}\``, "Fix the path in the lint config"); continue; }
     const vm = src.match(/^version:\s*(\S+)\s*$/m);
     if (!vm) { add("amber", "run-integrity", `\`${job.sourceSkill}\` has no \`version:\` in frontmatter — run output cannot be tied to a skill version`, "Add a version field and have the skill echo it in its provenance footer"); continue; }
     const expected = vm[1];
@@ -627,7 +654,7 @@ async function checkStateBudgets() {
   let clean = 0;
   for (const path of [...targets].sort()) {
     const text = await readSafe(join(ROOT, path));
-    if (text === null) { if (strict.has(path)) add("red", "state-budget", `Budgeted STATE \`${path}\` is missing`, "Fix path in lint.config.json or restore file"); continue; }
+    if (text === null) { if (strict.has(path)) add("red", "state-budget", `Budgeted STATE \`${path}\` is missing`, "Fix path in the lint config or restore file"); continue; }
 
     // Collect bullets per "## " section; indented bullets are counted separately.
     const sections = new Map();

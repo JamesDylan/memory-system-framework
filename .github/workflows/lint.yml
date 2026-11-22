@@ -37,6 +37,7 @@ jobs:
           git fetch --quiet --no-tags --depth=1 origin "$BASE"
           git worktree add --quiet --detach "$RUNNER_TEMP/base" "$BASE"
           cp .scripts/lint.mjs .scripts/lint.config.json .scripts/scorecard.mjs "$RUNNER_TEMP/base/.scripts/" # same rules on both sides (lint imports scorecard)
+          cp .scripts/lint.config.org.json "$RUNNER_TEMP/base/.scripts/" 2>/dev/null || true # the vault's own settings, if it has them
           node "$RUNNER_TEMP/base/.scripts/lint.mjs" --shared --json > "$RUNNER_TEMP/base.json"
           node .scripts/lint.mjs --shared --json > "$RUNNER_TEMP/head.json"
           node -e '
