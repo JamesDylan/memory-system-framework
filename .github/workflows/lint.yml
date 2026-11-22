@@ -45,8 +45,42 @@ jobs:
             const added = head.filter((m) => !base.includes(m));
             for (const m of added) console.log(`::error::New must-fix finding: ${m}`);
             process.exit(added.length ? 1 : 0);' "$RUNNER_TEMP/base.json" "$RUNNER_TEMP/head.json"
-      # shortcut: the metrics checker needs an installed vault (2_AREAS/<org>/_metrics/registry.yaml), which the engine repo
-      # is not. F1.7 runs it in the fresh-vault CI job instead.
+
+  # F1.7: every engine PR proves a fresh setup still works. Builds a vault from the example answers, lints it
+  # (0 must-fix), and runs every engine self-test. No secrets, no network beyond the runner's package installs.
+  fresh-vault:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pyyaml
+      - name: Fresh vault lints with 0 must-fix (init-vault --selftest)
+        run: python3 init-vault.py --selftest
+      - name: Engine self-tests
+        run: |
+          python3 .scripts/engine-upgrade.py --selftest
+          python3 .scripts/run_evals.py --selftest
+          python3 _metrics/check_metrics.py --registry templates/metrics-registry.template.yaml --selftest
+          node .scripts/health.mjs --selftest
+          for g in examples/seats/*/.claude/hooks/guard.py; do python3 "$g" --selftest || { echo "::error::$g selftest failed"; exit 1; }; done
+      - name: Metrics checker in a fresh vault
+        run: |
+          python3 - "$RUNNER_TEMP" <<'PY'
+          import json, os, sys
+          t = sys.argv[1]; a = json.load(open("templates/answers.example.json"))
+          a.update(SHARED_VAULT_PATH=os.path.join(t, "shared"), PRIVATE_VAULT_PATH=os.path.join(t, "private"))
+          json.dump(a, open(os.path.join(t, "answers.json"), "w"))
+          PY
+          python3 init-vault.py "$RUNNER_TEMP/answers.json" > /dev/null
+          cd "$RUNNER_TEMP/shared" && python3 2_AREAS/*/_metrics/check_metrics.py --root . --quiet
+      - name: Tree stays clean
+        run: test -z "$(git status --porcelain)" || { git status --porcelain; echo "::error::a self-test wrote into the repo"; exit 1; }
 
   weekly:
     if: github.event_name != 'pull_request'
