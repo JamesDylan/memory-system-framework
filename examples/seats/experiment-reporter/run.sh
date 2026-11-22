@@ -28,6 +28,7 @@ rm -f .out/note.txt
 [ "$rc" -eq 1 ] && exit 0                              # no new work: no model run
 [ "$rc" -ne 0 ] && { alert "the gate failed (exit $rc), so no round ran."; exit 0; }   # Slack or token error: tell a person
 
+../seat-qmd.sh || exit 1   # qmd search: shared vault only, never private notes
 claude -p "The vault is $VAULT. Do one round as set out in AGENTS.md, then stop." \
   --model "$MODEL" \
   --permission-mode dontAsk \

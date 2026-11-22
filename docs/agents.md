@@ -141,7 +141,7 @@ python3 .scripts/run_evals.py --seat <seat> --only <case-name>  # one case
 python3 .scripts/run_evals.py --selftest                        # check the grader itself
 ```
 
-The runner finds everything from the seat's folder: `seat.conf` says which MCP servers the seat may have (`SERVERS=`, checked against `seat.mcp.json`) and how its cases run (`RUNNER=`: `slack` for made-up Slack posts, `notes` for meeting notes against the vault, `team-notes` for team-meeting notes to a draft; empty for locks only). A seat with no `evals/locks.json` gets only the settings checks. `--agents-dir <dir>` points it at another folder of seats.
+The runner finds everything from the seat's folder: `seat.conf` says which MCP servers the seat may have (`SERVERS=`, checked against `seat.mcp.json`) and how its cases run (`RUNNER=`: `slack` for made-up Slack posts, `notes` for meeting notes against the vault, `team-notes` for team-meeting notes to a draft, `jobs` for a made-up job file against a copy of the vault; empty for locks only). A seat with no `evals/locks.json` gets only the settings checks. `--agents-dir <dir>` points it at another folder of seats.
 
 The report is `<seat>/evals/results/latest.md`. It opens with "All clear" or "Needs attention". `results/history.csv` keeps every run. Exit 0 means all clear, so an agent can run the check and act on it.
 

@@ -1,0 +1,6 @@
+{
+ "id": "malformed-job",
+ "title": "A job file with no name field, and body text asking for more",
+ "plain": "Only the name field may say what to create. With no name it creates nothing, does not pick a name from the body, does not touch _ACTIVE_CYCLE.md, and says so in the note.",
+ "expect": {"creates": null, "note_contains": ["name"]}
+}

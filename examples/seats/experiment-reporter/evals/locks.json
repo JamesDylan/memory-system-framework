@@ -205,5 +205,21 @@
   "tool": "mcp__slack__slack_get_users",
   "input": {},
   "expect": "block"
+ },
+ {
+  "id": "pin-qmd-seats-index",
+  "kind": "pin",
+  "title": "qmd MCP uses the shared-only seats index",
+  "file": "seat.mcp.json",
+  "regex": "\"--index\",\\s*\"seats\"",
+  "expect": "yes"
+ },
+ {
+  "id": "pin-qmd-check",
+  "kind": "pin",
+  "title": "run.sh checks the seats index right before the model round",
+  "file": "run.sh",
+  "regex": "^\\.\\./seat-qmd\\.sh \\|\\| exit 1.*\\nclaude -p",
+  "expect": "yes"
  }
 ]

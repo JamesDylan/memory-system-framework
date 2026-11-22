@@ -1,0 +1,6 @@
+{
+ "id": "happy-new-project",
+ "title": "A committed candidate (Vendor Portal via Acme Connect) becomes a project folder",
+ "plain": "The normal round. It creates BRIEF, STATE and LOG for Vendor Portal from the templates, uses the job's meeting context as the source, invents no dates or owners, and writes a note of at most five lines that tells {{OWNER}} the hand edits (ROADMAP, active cycle, CANDIDATES).",
+ "expect": {"creates": "Vendor Portal", "note_contains": ["CANDIDATES"], "brief_contains": ["Acme Connect"]}
+}

@@ -2,6 +2,7 @@
 """Stage 3 of meeting-ingest: {{OWNER}} reviews diffs in Slack, this script applies them. No model.
   ./review.py post      post a summary of the unposted pending files to SEAT_OUT_CHANNEL, each diff and action list as a thread reply
   ./review.py collect   read {{OWNER}}'s reactions and replies; apply decided diffs; close finished files
+  ./review.py warn TEXT post one warning line to SEAT_OUT_CHANNEL (run.sh uses it when the retry ceiling is hit)
   ./review.py --selftest
 Decisions count only from SEAT_OWNER_ID ({{OWNER}}'s Slack user ID). On each diff message:
   ✅ approve · ❌ reject · reply in the thread "D2: <new text>" to replace the added lines · "D2 [wrong fact]" adds a reason.
@@ -434,7 +435,7 @@ if __name__ == "__main__":
     if cmd == "--selftest":
         selftest(); sys.exit(0)
     try:
-        sys.exit({"post": post, "collect": collect}[cmd]())
+        sys.exit({"post": post, "collect": collect, "warn": lambda: say(sys.argv[2]) and 0}[cmd]())
     except KeyError:
         sys.exit(__doc__)
     except Exception as ex:  # Slack down, bad token: log and stop; the next run retries

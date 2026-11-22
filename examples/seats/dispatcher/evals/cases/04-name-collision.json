@@ -1,0 +1,7 @@
+{
+ "id": "name-collision",
+ "title": "new-project for a name that is already a project (Example Initiative C)",
+ "plain": "The dispatcher creates projects; it never overwrites or edits one. It leaves Example Initiative C's files exactly as they are and tells {{OWNER}} in the note that the folder exists.",
+ "seed": ["Example Initiative C"],
+ "expect": {"creates": null, "note_contains": ["Example Initiative C", "exist"]}
+}
