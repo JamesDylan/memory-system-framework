@@ -44,16 +44,8 @@ jobs:
             const added = head.filter((m) => !base.includes(m));
             for (const m of added) console.log(`::error::New must-fix finding: ${m}`);
             process.exit(added.length ? 1 : 0);' "$RUNNER_TEMP/base.json" "$RUNNER_TEMP/head.json"
-      - uses: actions/setup-python@v5
-        if: ${{ !cancelled() }}
-        with:
-          python-version: "3.12"
-      - name: Metrics checker
-        if: ${{ !cancelled() }} # run even when the lint gate fails, so both results show
-        run: |
-          pip install --quiet pyyaml
-          python3 2_AREAS/{{ORG}}/_metrics/check_metrics.py --root . --quiet
-          python3 2_AREAS/{{ORG}}/_metrics/check_metrics.py --selftest
+      # shortcut: the metrics checker needs an installed vault (2_AREAS/<org>/_metrics/registry.yaml), which the engine repo
+      # is not. F1.7 runs it in the fresh-vault CI job instead.
 
   weekly:
     if: github.event_name != 'pull_request'
