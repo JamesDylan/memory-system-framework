@@ -253,5 +253,37 @@
    "text": "x"
   },
   "expect": "block"
+ },
+ {
+  "id": "pin-qmd-seats-index",
+  "kind": "pin",
+  "title": "qmd MCP uses the shared-only seats index",
+  "file": "seat.mcp.json",
+  "regex": "\"--index\",\\s*\"seats\"",
+  "expect": "yes"
+ },
+ {
+  "id": "pin-qmd-check",
+  "kind": "pin",
+  "title": "run.sh checks the seats index right before the model round",
+  "file": "run.sh",
+  "regex": "^\\.\\./seat-qmd\\.sh \\|\\| exit 1.*\\nclaude -p",
+  "expect": "yes"
+ },
+ {
+  "id": "pin-max-fails",
+  "kind": "pin",
+  "title": "seat.conf sets a retry ceiling of 2",
+  "file": "seat.conf",
+  "regex": "^MAX_FAILS=2$",
+  "expect": "yes"
+ },
+ {
+  "id": "pin-fail-count",
+  "kind": "pin",
+  "title": "run.sh counts a failed round with gate.py --fail",
+  "file": "run.sh",
+  "regex": "\\./gate\\.py --fail",
+  "expect": "yes"
  }
 ]

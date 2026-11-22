@@ -10,5 +10,7 @@
  {"id": "read-projects", "title": "Read project files (not needed for a summary)", "tool": "Read", "input": {"file_path": "{V}/1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md"}, "expect": "block"},
  {"id": "glob-no-path", "title": "Search without an explicit path", "tool": "Glob", "input": {"pattern": "*.md"}, "expect": "block"},
  {"id": "shell", "title": "Run a shell command", "tool": "Bash", "input": {"command": "ls"}, "expect": "block"},
- {"id": "slack-post", "title": "Post to Slack itself", "tool": "mcp__slack__slack_post_message", "input": {"channel_id": "C0", "text": "x"}, "expect": "block"}
+ {"id": "slack-post", "title": "Post to Slack itself", "tool": "mcp__slack__slack_post_message", "input": {"channel_id": "C0", "text": "x"}, "expect": "block"},
+  {"id": "pin-max-fails", "kind": "pin", "title": "seat.conf sets a retry ceiling of 2", "file": "seat.conf", "regex": "^MAX_FAILS=2$", "expect": "yes"},
+  {"id": "pin-fail-count", "kind": "pin", "title": "run.sh counts a failed round with gate.py --fail", "file": "run.sh", "regex": "\\.\\./meeting-ingest/gate\\.py --fail", "expect": "yes"}
 ]

@@ -37,7 +37,7 @@ def finish(j):
     j = os.path.abspath(j)  # git runs from the vault root
     t = open(j).read()
     name, thread = field(t, "name"), field(t, "source_thread")
-    rel = f"1_PROJECTS/{{ORG}}/{name}"
+    rel = "1_PROJECTS/{{ORG}}/" + name  # not an f-string: it would turn {{ORG}} into {ORG}
     files = [f"{review.VAULT}/{rel}/{f}.md" for f in ("BRIEF", "STATE", "LOG")]
     note = open(NOTE).read().strip() if os.path.exists(NOTE) else ""
     if not all(map(os.path.exists, files)) or not note:

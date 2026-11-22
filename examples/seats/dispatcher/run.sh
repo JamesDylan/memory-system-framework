@@ -11,6 +11,7 @@ set -a; . "$HOME/.config/meeting-ingest.env" || exit 1; set +a
 mkdir -p .out; rm -f .out/note.txt .out/created.txt
 JOB="$(./dispatch.py next)" || exit 0   # claims the oldest open job; none: no model run
 export DISPATCH_JOB="$JOB"               # guard.py reads the job's name from it
+../seat-qmd.sh || exit 1   # qmd search: shared vault only, never private notes
 claude -p "Run the job in $JOB as set out in AGENTS.md, then stop." \
   --model "$MODEL" \
   --permission-mode dontAsk \

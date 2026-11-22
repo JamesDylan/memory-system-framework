@@ -17,6 +17,11 @@ Last verified: 2026-11-18.
 
 The clock is outside the agent. macOS launchd starts `run.sh`. `run.sh` checks Slack first. No new message means no AI run and no cost. Model, step limit (25) and cost cap ($2 per run) are set in the seat's `seat.conf`.
 
+Two more limits apply to every seat that runs a model:
+
+- **Search sees the shared vault only.** A seat's qmd MCP uses the `seats` index (`--index seats` in `seat.mcp.json`), which `.scripts/qmd-bootstrap.sh` builds without the private collection. `run.sh` calls `../seat-qmd.sh` right before the model round: it stops the round if that index holds `memory_private`, else refreshes it.
+- **Retries stop.** meeting-ingest and team-sync retry a meeting whose round wrote nothing, but only `MAX_FAILS` times (`seat.conf`, default 2). Then `gate.py --fail` marks it seen and `run.sh` posts one warning with `review.py warn`.
+
 ## Start, stop, check (experiment-reporter)
 
 | I want to | Run this |
@@ -77,7 +82,7 @@ No model, so no eval check: `./feed.py --selftest` (no network) tests the block 
 | Secrets (Slack bot token, team ID, Claude token, output channel) | `~/.config/experiment-reporter.env`, outside the repo. Never commit it. |
 | Schedule | `~/Library/LaunchAgents/com.{{USER_ID}}.experiment-reporter.plist` |
 | What the seat may edit | Only new files in `2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/insights/` (never an existing insight), its timestamp and note files. Not `registry.yaml`: the weekly PowerBI update is its one writer, and the seat proposes values in its note. The hook enforces it. |
-| Audit against the six laws | `templates/laws-audit.md`. Conditional pass; Q17 open in `1_PROJECTS/Gas Town/OPEN_QUESTIONS.md`. |
+| Audit against the six laws | `templates/laws-audit.md`. Conditional pass, signed off (re-stamped 2026-11-22 after Q17). Other seats: `1_PROJECTS/Gas Town/audits/2026-11-22-laws-audit-meeting-ingest.md` (FAIL, Law 5), `…-dispatcher.md` (conditional pass). |
 | History of the build | `1_PROJECTS/Gas Town/LOG.md` entry 2026-11-13 (e) |
 
 ## Run the check

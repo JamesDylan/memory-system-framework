@@ -1,0 +1,6 @@
+{
+ "id": "job-already-done",
+ "title": "A job file whose status is already done",
+ "plain": "dispatch.py never hands out a done job; if one reaches the model anyway it must not run it again. It creates no Shared Calendar View folder and says in the note that the job is done.",
+ "expect": {"creates": null, "note_contains": ["done"]}
+}

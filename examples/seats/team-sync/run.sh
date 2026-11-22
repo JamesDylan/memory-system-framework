@@ -21,5 +21,9 @@ claude -p "Do one round as set out in AGENTS.md, then stop." \
   --output-format stream-json --verbose \
   --max-turns "$MAX_TURNS" --max-budget-usd "$MAX_BUDGET_USD" < /dev/null > "$HOME/.config/team-sync.log" 2>&1
 
-# Post first (it reads the meeting header in .in/), then mark seen: a failed round or post retries next time.
-[ -s .out/canvas.md ] && ./canvas.py post && ../meeting-ingest/gate.py --mark
+# Post first (it reads the meeting header in .in/), then mark seen: a failed round or post retries next time,
+# up to MAX_FAILS rounds per meeting (law 5); then the meeting is given up and {{OWNER}} is warned.
+if [ -s .out/canvas.md ] && ./canvas.py post; then ../meeting-ingest/gate.py --mark; else
+  dead="$(../meeting-ingest/gate.py --fail)"
+  [ -n "$dead" ] && ../meeting-ingest/review.py warn ":warning: team-sync gave up on meeting notes $dead after $MAX_FAILS failed rounds. See ~/.config/team-sync.log."
+fi

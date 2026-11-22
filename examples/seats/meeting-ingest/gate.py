@@ -2,6 +2,8 @@
 """The clock's check. No model runs here.
   ./gate.py            find transcripts attached to recent calendar events, not yet seen; export them to .in/. Exit 0 if any.
   ./gate.py --mark     record this batch as seen. run.sh calls this after a round that wrote a note.
+  ./gate.py --fail     count a round that wrote no note. A transcript that fails MAX_FAILS rounds is marked seen
+                       (no more retries) and its file id printed, so run.sh can warn {{OWNER}} (law 5).
   ./gate.py --selftest check the picking logic offline.
 Read-only Google access (calendar.readonly, drive.readonly) from GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
 GOOGLE_REFRESH_TOKEN in ~/.config/meeting-ingest.env. The seat itself has no Google access; it reads .in/ only."""
@@ -9,10 +11,11 @@ import json, os, re, shutil, sys, urllib.parse, urllib.request
 from datetime import datetime, timedelta, timezone
 
 HERE = os.environ.get("SEAT_DIR") or os.path.dirname(os.path.abspath(__file__))  # team-sync runs this gate with its own SEAT_DIR
-SEEN, BATCH, IN = HERE + "/.out/seen.txt", HERE + "/.out/.batch", HERE + "/.in"
+SEEN, BATCH, IN, FAILS = HERE + "/.out/seen.txt", HERE + "/.out/.batch", HERE + "/.in", HERE + "/.out/fails.txt"
 CONF = dict(re.findall(r'^(\w+)=(\'[^\']*\'|"[^"]*"|\S+)', open(HERE + "/seat.conf").read(), re.M))  # quoted values may hold spaces
 LOOKBACK_H, MAX_MEETINGS = int(CONF.get("LOOKBACK_HOURS", 48)), int(CONF.get("MAX_MEETINGS", 3))
 MIN_ATTENDEES = int(CONF.get("MIN_ATTENDEES", 3))
+MAX_FAILS = int(CONF.get("MAX_FAILS", 2))  # retry ceiling per transcript (law 5)
 TITLE_MATCH = CONF.get("TITLE_MATCH", "").strip("'\"")  # optional: only meetings whose title matches this regex (case-insensitive)
 DOC = "application/vnd.google-apps.document"
 
@@ -89,6 +92,20 @@ def mark():
     return 0
 
 
+def fail():
+    """A round wrote no note. Count one failure per transcript in the batch; give up on any that reached MAX_FAILS."""
+    if not os.path.exists(BATCH):
+        return 0
+    batch = open(BATCH).read().split()
+    open(FAILS, "a").write("".join(f + "\n" for f in batch))
+    fails = open(FAILS).read().split()
+    dead = [f for f in batch if fails.count(f) >= MAX_FAILS]
+    if dead:
+        open(SEEN, "a").write("".join(f + "\n" for f in dead))
+        print(" ".join(dead))
+    return 0
+
+
 def selftest():
     tr = {"mimeType": DOC, "fileId": "T", "title": "Standup - Transcript"}
     gn = {"mimeType": DOC, "fileId": "G", "title": "Standup - Notes by Gemini"}
@@ -107,6 +124,21 @@ def selftest():
     assert len(pick([ev([gn], title="{{PRODUCT}} Product Team - Fortnightly Ops meeting")], set(), rd)) == 1
     assert pick([ev([gn], title="Grow Users - Roadmap")], set(), rd) == []
     assert slug("CH: Release 3 / Standup!") == "ch-release-3-standup"
+    import tempfile, io, contextlib  # retry ceiling: a transcript is given up after MAX_FAILS failed rounds
+    global SEEN, BATCH, FAILS
+    keep, d = (SEEN, BATCH, FAILS), tempfile.mkdtemp()
+    SEEN, BATCH, FAILS = d + "/seen", d + "/batch", d + "/fails"
+    try:
+        runs = []
+        for _ in range(MAX_FAILS):
+            open(BATCH, "w").write("A\nB\n")
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                fail()
+            runs.append(out.getvalue().split())
+        assert runs[-1] == ["A", "B"] and all(r == [] for r in runs[:-1]), runs
+        assert open(SEEN).read().split() == ["A", "B"]
+    finally:
+        SEEN, BATCH, FAILS = keep
     print("ok")
 
 
@@ -115,7 +147,7 @@ if __name__ == "__main__":
     if "--selftest" in sys.argv:
         selftest(); sys.exit(0)
     try:
-        sys.exit(mark() if "--mark" in sys.argv else gate())
+        sys.exit(mark() if "--mark" in sys.argv else fail() if "--fail" in sys.argv else gate())
     except Exception as ex:  # no network, expired token: no model run, and say why in the launchd log
         print(f"gate error: {ex}", file=sys.stderr)
         sys.exit(1)

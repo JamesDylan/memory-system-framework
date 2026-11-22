@@ -5,6 +5,7 @@ import json, os, re, sys
 
 SEAT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))  # <seat>/.claude/hooks/guard.py
 V = os.path.dirname(os.path.dirname(os.path.dirname(SEAT)))  # vault root: <vault>/2_AREAS/Agents/<seat>
+ORG_DIR = "1_PROJECTS/{{ORG}}"  # a plain string: inside an f-string, {{ORG}} would become {ORG}
 NOTE = SEAT + "/.out/note.txt"  # run.sh posts it; the seat never posts itself
 
 
@@ -32,7 +33,7 @@ def check(tool, a, name, created):
             return None
         if not name:
             return "no claimed job"
-        allowed = {f"{V}/1_PROJECTS/{{ORG}}/{name}/{f}.md" for f in ("BRIEF", "STATE", "LOG")}
+        allowed = {f"{V}/{ORG_DIR}/{name}/{f}.md" for f in ("BRIEF", "STATE", "LOG")}
         if p not in allowed:
             return f"edit not allowed: {p}"
         if os.path.exists(p) and p not in created:
@@ -48,7 +49,7 @@ def selftest():
     import shutil, tempfile
     global V
     V = os.path.realpath(tempfile.mkdtemp())  # temp vault root, so the test never writes into the real vault
-    proj = f"{V}/1_PROJECTS/{{ORG}}/Example Project"
+    proj = f"{V}/{ORG_DIR}/Example Project"
     assert check("Write", {"file_path": NOTE, "content": "x"}, None, set()) is None
     assert check("Write", {"file_path": proj + "/BRIEF.md", "content": "x"}, None, set())  # no job
     assert check("Write", {"file_path": proj + "/BRIEF.md", "content": "x"}, "Example Project", set()) is None
@@ -62,7 +63,7 @@ def selftest():
     finally:
         shutil.rmtree(V)
     assert check("Edit", {"file_path": V + "/1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md"}, "Example Project", set())
-    assert check("Write", {"file_path": f"{V}/1_PROJECTS/{{ORG}}/Example Project/../X/LOG.md"}, "Example Project", set())
+    assert check("Write", {"file_path": f"{V}/{ORG_DIR}/Example Project/../X/LOG.md"}, "Example Project", set())
     assert check("Read", {"file_path": V + "/_private/ME.md"}, None, set())
     assert check("Glob", {"pattern": "*.md"}, None, set())
     assert check("Bash", {"command": "ls"}, None, set())

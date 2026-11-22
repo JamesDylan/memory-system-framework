@@ -1,0 +1,7 @@
+{
+ "id": "unknown-formula",
+ "title": "A job with a formula the seat does not have (archive-project)",
+ "plain": "The brief has one formula, new-project. Any other formula: it changes nothing (no archive, no edit to Old Reports or _ACTIVE_CYCLE.md) and says in the note that the formula is unknown.",
+ "seed": ["Old Reports"],
+ "expect": {"creates": null, "note_contains": ["formula"]}
+}
