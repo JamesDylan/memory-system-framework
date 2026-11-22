@@ -1,6 +1,6 @@
 # Agents: set up, run, test and build
 
-This guide covers the scheduled agents ("seats") in `2_AREAS/Agents/`. A person can follow it, or you can hand it to your own agent:
+This guide covers the scheduled agents ("seats") in `2_AREAS/Agents/`. A new vault has none: the seats below ship as examples in `examples/seats/`, and you copy in the ones you want. A person can follow it, or you can hand it to your own agent:
 
 > Read `docs/agents.md` and set up the `<seat>` seat in this vault. Do one step at a time and show me each command before you run it. Never write a secret into the repo: tell me which file to open and which line to add, and I will paste the value myself.
 
@@ -10,12 +10,15 @@ Paths are relative to the shared vault (the folder `init-vault.py` built), not t
 
 | Thing | Where | In git? |
 |---|---|---|
-| The seats: brief, launcher, gate, settings, safety hook | `2_AREAS/Agents/<seat>/` | Yes |
-| Evals: locks, behaviour cases and the runner | `2_AREAS/Agents/evals/` | Yes. `results/` is written locally |
+| Example seats to copy from | `examples/seats/<seat>/` | Yes (engine) |
+| Your seats: brief, launcher, gate, settings, safety hook | `2_AREAS/Agents/<seat>/` | Yes |
+| A seat's evals: locks and behaviour cases | `2_AREAS/Agents/<seat>/evals/` | Yes. `evals/results/` is written locally |
+| The eval runner | `.scripts/run_evals.py` (engine) | Yes |
 | Jobs the dispatcher runs | `2_AREAS/Agents/jobs/` | Yes, one file per job |
 | Template for a new seat | `templates/seat/`, `templates/seat-brief.md` | Yes |
 | Safety audit before a seat goes on a clock | `templates/laws-audit.md` | Yes |
-| Operating notes for each seat (start, stop, check) | `2_AREAS/Agents/README.md` | Yes |
+| What runs in this vault | `2_AREAS/Agents/README.md` | Yes |
+| Operating notes for each example seat (start, stop, check) | `examples/seats/README.md` | Yes |
 | **Secrets** (tokens, channel IDs) | `~/.config/<seat>.env` | **No. Never** |
 | **The clock** (macOS launchd job) | `~/Library/LaunchAgents/com.<you>.<seat>.plist`, made from `templates/seat/launchd.plist` | No |
 | Logs | `~/.config/<seat>.log` (last model round), `~/.config/<seat>.launchd.log` (gate and launcher) | No |
@@ -23,7 +26,7 @@ Paths are relative to the shared vault (the folder `init-vault.py` built), not t
 
 Everything outside the vault is per person and per machine. This guide is how you recreate it.
 
-## The seats
+## The example seats
 
 | Seat | Job | Reads | Env file | Clock |
 |---|---|---|---|---|
@@ -42,6 +45,7 @@ Start with one seat. `meeting-ingest` gives the most value; `kr-feed` is the che
 - macOS (the clock is launchd). Python 3 at `/usr/bin/python3`. Node, and `qmd` for search.
 - Claude Code installed, with `claude` on your PATH.
 - The vault built with `init-vault.py` and committed to git.
+- The seat copied in, evals included: `cp -R examples/seats/<seat> 2_AREAS/Agents/` (from the vault root). Paths below are relative to the vault root.
 
 ### 2. Make the accounts and tokens (you, not your agent)
 
@@ -70,17 +74,16 @@ The export replaces your organisation's IDs with markers. Search the seat for th
 grep -rn "SLACK_ID\|SLACK_TEAM_ID\|SLACK_CANVAS_ID" 2_AREAS
 ```
 
-- `experiment-reporter`: the channel it reads (`IN_CH` in `.claude/hooks/guard.py`, `CHANNEL` in `2_AREAS/<Org>/_metrics/check_new_experiments.py`, and the brief). Use the same ID in `evals/experiment-reporter/locks.json` so the lock still tests the real channel.
+- `experiment-reporter`: the channel it reads (`IN_CH` in `.claude/hooks/guard.py`, `CHANNEL` in `2_AREAS/<Org>/_metrics/check_new_experiments.py`, and the brief). Use the same ID in `experiment-reporter/evals/locks.json` so the lock still tests the real channel.
 - `team-sync`: `CANVAS_ID` in `seat.conf` and the team ID in `canvas.py`. `TITLE_MATCH` in `seat.conf` picks which meetings it summarises.
 - Read the brief (`AGENTS.md`) once. It names your channels, projects and the person who approves.
 
 ### 5. Check it before it runs
 
 ```bash
-cd 2_AREAS/Agents
-/usr/bin/python3 <seat>/.claude/hooks/guard.py --selftest     # the safety hook
-./evals/run_evals.py --locks-only --seat <seat>                # free, seconds: do the locks still refuse?
-./evals/run_evals.py --seat <seat>                             # a few dollars: behaviour on made-up input, in a sandbox
+/usr/bin/python3 2_AREAS/Agents/<seat>/.claude/hooks/guard.py --selftest   # the safety hook
+python3 .scripts/run_evals.py --locks-only --seat <seat>                    # free, seconds: do the locks still refuse?
+python3 .scripts/run_evals.py --seat <seat>                                 # a few dollars: behaviour on made-up input, in a sandbox
 ```
 
 Scripts with their own self-check: `dispatcher/dispatch.py`, `meeting-ingest/gate.py`, `meeting-ingest/review.py`, `team-sync/canvas.py` and `kr-feed/feed.py`, each with `--selftest`.
@@ -124,20 +127,22 @@ The Mac must be on. A run missed while asleep happens on wake. A gate that finds
 
 ## Evals
 
-Every seat that runs a model has two kinds of check in `2_AREAS/Agents/evals/<seat>/`:
+Every seat that runs a model has two kinds of check in `2_AREAS/Agents/<seat>/evals/`:
 
 - **Locks** (`locks.json`): a list of tool calls the safety hook must allow or block. Free and fast, no model. A lock with `"needs_file": true` is about an existing file; the runner makes a stand-in when your vault has none.
 - **Behaviour cases** (`cases/`): made-up input (Slack posts or meeting notes). The seat runs on it in a sandbox copy of the vault, and fixed rules grade what it did. No model grades another model.
 
 ```bash
-./evals/run_evals.py --seat <seat>         # one seat, both parts (default seat: experiment-reporter)
-./evals/run_evals.py --seat <seat> --locks-only   # part 1 only
-./evals/run_evals.py --model <model>       # try another model
-./evals/run_evals.py --only <case-name>    # one case
-./evals/run_evals.py --selftest            # check the grader itself
+python3 .scripts/run_evals.py --seat <seat>                     # one seat, both parts
+python3 .scripts/run_evals.py --seat <seat> --locks-only        # part 1 only
+python3 .scripts/run_evals.py --seat <seat> --model <model>     # try another model
+python3 .scripts/run_evals.py --seat <seat> --only <case-name>  # one case
+python3 .scripts/run_evals.py --selftest                        # check the grader itself
 ```
 
-The report is `evals/results/latest.md`. It opens with "All clear" or "Needs attention". `results/history.csv` keeps every run. Exit 0 means all clear, so an agent can run the check and act on it.
+The runner finds everything from the seat's folder: `seat.conf` says which MCP servers the seat may have (`SERVERS=`, checked against `seat.mcp.json`) and how its cases run (`RUNNER=`: `slack` for made-up Slack posts, `notes` for meeting notes against the vault, `team-notes` for team-meeting notes to a draft; empty for locks only). A seat with no `evals/locks.json` gets only the settings checks. `--agents-dir <dir>` points it at another folder of seats.
+
+The report is `<seat>/evals/results/latest.md`. It opens with "All clear" or "Needs attention". `results/history.csv` keeps every run. Exit 0 means all clear, so an agent can run the check and act on it.
 
 **Rerun after** a model change, any edit to a seat's `AGENTS.md`, `run.sh`, `settings.json` or `guard.py`, or a bad week.
 
@@ -146,9 +151,9 @@ The report is `evals/results/latest.md`. It opens with "All clear" or "Needs att
 ## Build a new seat
 
 1. Pick the manual job that costs you most. It needs a gate a script can check, one place to write, and an output a person can approve.
-2. Copy `templates/seat/` to `2_AREAS/Agents/<name>/` and follow `templates/seat-brief.md`: fill the placeholders, write the brief, the gate and the hook.
+2. Copy `templates/seat/` (or the closest example in `examples/seats/`) to `2_AREAS/Agents/<name>/` and follow `templates/seat-brief.md`: fill the placeholders, write the brief, the gate and the hook.
 3. Choose the cheapest model that passes (`seat.conf`), and set the turn limit and cost cap.
-4. Add `evals/<name>/locks.json` and `cases/`, and register the seat in `SERVERS` and `RUNNERS` in `evals/run_evals.py`.
+4. Add `<name>/evals/locks.json` and `<name>/evals/cases/`, and set `SERVERS=` and `RUNNER=` in its `seat.conf`. No engine file changes.
 5. Pass the evals, do one hand run, pass the [safety audit](../templates/laws-audit.md), then put it on a clock (step 7 above).
 6. Add a row to `2_AREAS/Agents/README.md`.
 

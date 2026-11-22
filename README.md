@@ -8,7 +8,7 @@ You can run all of it by hand, one prompt at a time, and add agents one job at a
 
 > **This repo is the engine, not a vault.** It holds the scripts, rules, agent skills and agent templates. It holds no notes and no data. One setup command builds the vaults (folders of plain Markdown notes) that the engine runs on.
 >
-> **The agent layer is here.** The scheduled agents, the dispatcher and the evals are in `2_AREAS/Agents/`. Each one runs in the author's vault. To set them up on your own machine, follow **[docs/agents.md](docs/agents.md)**, or hand that guide to your agent.
+> **The agent layer is here.** The scheduled agents and the dispatcher ship as examples in `examples/seats/`, each with its evals; the eval runner is `.scripts/run_evals.py`. A new vault starts with an empty `2_AREAS/Agents/`: copy in the seats you want. Each one runs in the author's vault. To set them up on your own machine, follow **[docs/agents.md](docs/agents.md)**, or hand that guide to your agent.
 
 ## Why use it
 
@@ -86,7 +86,7 @@ Each seat also has its own model (the cheapest one that passes), a turn limit, a
 
 ### What runs today
 
-All in `2_AREAS/Agents/`. Status is from the author's own vault:
+Examples in `examples/seats/`. Status is from the author's own vault:
 
 | Agent | Job | Status |
 |---|---|---|
@@ -120,7 +120,7 @@ Three parts work together. None is rebuilt by the others.
 | Part | Gives | Where |
 |---|---|---|
 | **The memory system** | Shared facts, one home each, with sources and stamps | This engine, and the vaults it builds |
-| **The agents (seats)** | Work on a clock, with hard limits, locks and evals | `2_AREAS/Agents/` in this engine |
+| **The agents (seats)** | Work on a clock, with hard limits, locks and evals | `examples/seats/` in this engine; `2_AREAS/Agents/` in a vault |
 | **The pipelines** | Discovery, PCB, one-pager and PRD stages, a prototype kit and a "twin" of the product on made-up data | The team's discovery lab repo |
 
 Joined, they work like this:
@@ -228,7 +228,7 @@ Templates are in `templates/`.
 | Capture | `daily-slack-review`, `watch` | Pull signal into the inbox |
 | Route | `ingest`, `diff-propose` | Classify, propose, apply, log |
 | Think | `second-brain`, `challenge`, `emerge`, `connect`, `calibrate`, `review-prep`, `debloat` | Read the vault for a purpose |
-| Automate | `2_AREAS/Agents/` (seats, dispatcher, evals), `templates/seat/` (incl. `launchd.plist`), `templates/seat-brief.md`, `templates/laws-audit.md`. Guide: [docs/agents.md](docs/agents.md) | Scheduled agents with one job each, their own model, cost cap, tool list and write folder. Each posts a short note for a person to approve |
+| Automate | `examples/seats/` (seats, dispatcher, their evals), `.scripts/run_evals.py`, `2_AREAS/Agents/` (your seats), `templates/seat/` (incl. `launchd.plist`), `templates/seat-brief.md`, `templates/laws-audit.md`. Guide: [docs/agents.md](docs/agents.md) | Scheduled agents with one job each, their own model, cost cap, tool list and write folder. Each posts a short note for a person to approve |
 | Publish | `.scripts/export-framework.py` | Export the engine with no organisation data |
 
 `watch`, `calibrate` and `debloat` ship in `private/` and install into the private vault (`_private/3_RESOURCES/AI Skills/`), because they read or write private data.

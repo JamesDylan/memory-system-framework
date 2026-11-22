@@ -66,7 +66,7 @@ Google access is read-only (`calendar.readonly`, `drive.readonly`) and belongs t
 - [ ] `laws-audit.md` completed. Note: the transcript is untrusted input, and the seat has write access (LOG.md). The way out is the note only; STATE stays behind {{OWNER}}.
 - [x ] Named person accountable for the output: {{OWNER_NAME}}.
 - [x] Ceiling set: `MAX_TURNS=40`, `MAX_BUDGET_USD=3` per run.
-- [x] Model chosen in `seat.conf` and checked with an eval for this seat: `../evals/meeting-ingest/`, 2026-11-16 Sonnet 5.5, locks 32/32, behaviour 6/6.
+- [x] Model chosen in `seat.conf` and checked with an eval for this seat: `evals/`, 2026-11-16 Sonnet 5.5, locks 32/32, behaviour 6/6.
 - [ ] Worst-case weekly cost: $3 per round that has a transcript; empty gate runs cost nothing. At 15 meetings a week, about $45. Raise `MAX_MEETINGS` to batch more per round if this is too high.
 
 ## Hand-run log
