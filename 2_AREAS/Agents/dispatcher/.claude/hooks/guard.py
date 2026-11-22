@@ -45,21 +45,22 @@ def check(tool, a, name, created):
 
 
 def selftest():
-    import tempfile
+    import shutil, tempfile
+    global V
+    V = os.path.realpath(tempfile.mkdtemp())  # temp vault root, so the test never writes into the real vault
     proj = f"{V}/1_PROJECTS/{{ORG}}/Example Project"
     assert check("Write", {"file_path": NOTE, "content": "x"}, None, set()) is None
     assert check("Write", {"file_path": proj + "/BRIEF.md", "content": "x"}, None, set())  # no job
     assert check("Write", {"file_path": proj + "/BRIEF.md", "content": "x"}, "Example Project", set()) is None
     assert check("Write", {"file_path": proj + "/notes.md", "content": "x"}, "Example Project", set())
     assert check("Write", {"file_path": V + "/1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/STATE.md", "content": "x"}, "Example Project", set())
-    made = V + "/1_PROJECTS/{{ORG}}/zz-selftest-project"  # an existing project, made here so the test runs in any vault
-    os.makedirs(made, exist_ok=True)
+    made = V + "/1_PROJECTS/{{ORG}}/zz-selftest-project"  # an existing project
+    os.makedirs(made)
     open(made + "/STATE.md", "w").close()
     try:
         assert check("Write", {"file_path": made + "/STATE.md", "content": "x"}, "zz-selftest-project", set())  # exists
     finally:
-        os.remove(made + "/STATE.md")
-        os.rmdir(made)
+        shutil.rmtree(V)
     assert check("Edit", {"file_path": V + "/1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md"}, "Example Project", set())
     assert check("Write", {"file_path": f"{V}/1_PROJECTS/{{ORG}}/Example Project/../X/LOG.md"}, "Example Project", set())
     assert check("Read", {"file_path": V + "/_private/ME.md"}, None, set())
