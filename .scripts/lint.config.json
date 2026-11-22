@@ -64,6 +64,7 @@
   "deadPointerExcludeSources": [
     "1_PROJECTS/{{ORG}}/12 month vision/**",
     "1_PROJECTS/memory-system-upgrade/**",
+    "3_RESOURCES/AI Skills/memory-system-upgrade/**",
     "1_PROJECTS/Gas Town/reference/**",
     "1_PROJECTS/Gas Town/templates/**",
     "1_PROJECTS/Gas Town/audits/**",
