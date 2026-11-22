@@ -263,7 +263,7 @@ Copy the skills you use to your agent's skills folder, or point it at `3_RESOURC
 python3 .scripts/engine-upgrade.py <tag>   # from a clean git tree; --repo <url-or-path> if the lock has none
 ```
 
-It installs the tag in a temp folder with your organisation values, then updates each engine file you have not changed. A file you changed stays as it is: if the engine changed it too, the new version is written beside it as `<file>.upstream` for you to merge. New engine files are added. Removed ones are listed, not deleted. It rewrites engine.lock and never commits: review the diff, run lint, commit on a branch.
+It installs the tag in a temp folder with your organisation values, then updates each engine file you have not changed. A file you changed stays as it is: if the engine changed it too, the new version is written beside it as `<file>.upstream` for you to merge. New engine files are added. Removed ones are listed, not deleted. An engine file you deleted stays deleted, and the lock records that. If a new engine file would land on a file of your own, yours is left alone and listed as a name clash to rename. It rewrites engine.lock and never commits: review the diff, run lint, commit on a branch.
 
 A vault set up before engine.lock: `python3 .scripts/engine-upgrade.py --adopt <tag> --values answers.json` writes a first lock for that tag and lists every engine file that differs from it. Private-vault engine files (`private/` here) are not in the lock yet: upgrade those by hand.
 

@@ -184,10 +184,11 @@ function profileGaps(text) {
   return out;
 }
 // Stamp lines aside, a cycle file names its cycle with a date or a "cycle ... <number>" line.
-// Check 14 helper (F1.6): compare engine files with the hashes in engine.lock. hashOf(p) is null when p is missing.
+// Check 14 helper (F1.6): compare engine files with the hashes in engine.lock. hashOf(p) is null when p is missing. A null hash in the lock = deleted on purpose (opted out).
 function engineDrift(files, hashOf, exists) {
   const out = [];
   for (const [p, h] of Object.entries(files)) {
+    if (h === null) continue;
     const got = hashOf(p);
     if (got === null) out.push(["missing", p]);
     else if (got !== h) out.push(["changed", p]);
@@ -249,7 +250,7 @@ if (process.argv.includes("--selftest")) {
   ok(layerConfig(eng, null).d.join() === "1", "config: no org file means engine only");
   ok(/lint\.config\.org\.json is not valid JSON/.test((() => { try { layerConfig(eng, "{ bad"); } catch (e) { return e.message; } })()), "config: bad org JSON is an error");
   ok(/must hold a JSON object/.test((() => { try { layerConfig(eng, "[]"); } catch (e) { return e.message; } })()), "config: org file must be an object");
-  const dr = engineDrift({ a: "1", b: "2", c: "3", d: "4" }, (p) => ({ a: "1", b: "x", d: "4" })[p] ?? null, (p) => p === "d.upstream");
+  const dr = engineDrift({ a: "1", b: "2", c: "3", d: "4", e: null }, (p) => ({ a: "1", b: "x", d: "4" })[p] ?? null, (p) => p === "d.upstream");
   ok(JSON.stringify(dr) === JSON.stringify([["changed", "b"], ["missing", "c"], ["conflict", "d.upstream"]]), "engine-drift: changed, missing and unresolved conflict; same hash is clean");
   if (!process.exitCode) console.log("selftest ok"); process.exit();
 }
