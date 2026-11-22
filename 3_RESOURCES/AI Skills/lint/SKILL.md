@@ -52,7 +52,7 @@ thresholds, which operational files and path patterns are under the freshness
 check, scanned directories and recognised extensions for dead pointers, inbox
 age, skill-registration exemptions, deployed-skill mirrors, run-integrity jobs).
 `.scripts/lint.config.json` is the engine's: defaults, and a `_comment` on each
-knob saying what it means. `.scripts/lint.config.org.json` is this vault's own,
+knob saying what it means. `lint.config.org.json` (next to it in `.scripts/`) is this vault's own,
 and lint merges it over the engine file: objects merge key by key, and an array
 or value there replaces the engine's (to extend an engine list, copy it there and
 add to it). Put every vault-specific setting in the org file (pilot STATEs in
