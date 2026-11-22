@@ -1,0 +1,173 @@
+{
+  "_comment": "Policy knobs for lint.mjs (the deterministic half of the lint skill). Editable without touching code. Rhythms map to staleness thresholds below. Add operational files here to bring them under the staleness check.",
+  "stalenessThresholdsDays": {
+    "weekly": 10,
+    "biweekly": 21,
+    "monthly": 40,
+    "quarterly": 100
+  },
+  "_verificationComment": "How long a file may go without someone confirming its CONTENT is still true, as distinct from being edited. Deliberately looser than the edit thresholds — an actively-worked file is expected to be touched more often than it is re-read end to end. Added 2026-08-10 after {{PILOT}} STATE.md sat at 'Last verified accurate: 2026-08-07' while being touched daily, and lint reported it as fresh.",
+  "verificationThresholdsDays": {
+    "weekly": 14,
+    "biweekly": 28,
+    "monthly": 45,
+    "quarterly": 110
+  },
+  "operationalFiles": [
+    { "path": "1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md", "rhythm": "weekly" },
+    { "path": "2_AREAS/{{ORG}}/context/metrics_dashboard.md", "rhythm": "weekly" },
+    { "path": "_private/2_AREAS/{{ORG}}/My Team/Direct Reports.md", "rhythm": "weekly" },
+    { "path": "2_AREAS/{{ORG}}/context/stakeholder_map.md", "rhythm": "quarterly" },
+    { "path": "_private/2_AREAS/{{ORG}}/context/team_development.md", "rhythm": "biweekly" },
+    { "path": "2_AREAS/{{ORG}}/context/strategic_context.md", "rhythm": "monthly" },
+    { "path": "2_AREAS/{{ORG}}/context/company_context.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/context/cy27_objectives.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/context/{{PRODUCT_LOWER}}_2030_vision.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/context/churn_prevention_2026.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/context/travel_arranger_icp.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/partner_travel_trends_tracker.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/data_and_key_assumptions.md", "rhythm": "quarterly" },
+    { "path": "2_AREAS/{{ORG}}/_metrics/registry.yaml", "rhythm": "weekly" }
+  ],
+  "_requireVerifiedComment": "Move 11c (2026-11-20). Shared context must carry the stamp block (Last Updated, Last verified accurate, Source as of, Owner, Review Cycle). A file here with no Last verified accurate stamp is reported, so 'edited' is never read as 'checked'. registry.yaml is covered by its newest as_of instead.",
+  "requireVerified": ["2_AREAS/{{ORG}}/context/*.md", "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/*.md", "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/insights/*.md", "2_AREAS/{{ORG}}/_metrics/registry.yaml"],
+  "_refreshContractsComment": "Move 11f (2026-11-20). A refresh contract says where a slow file's facts come from, how often that source publishes, and who confirms the file. Each path must also be in operationalFiles (its rhythm sets the confirm window, from verificationThresholdsDays). Lint reads the FIRST date on the file's Source as of line (registry.yaml: newest as_of). It reports 'source-newer' when that date is older than sourceEveryDays + sourceGraceDays, and 'contract-overdue' when Last verified accurate is 'not yet' or older than the confirm window. Lint cannot see the source itself, so 'source-newer' means 'a newer edition is due', not 'one was seen'. Files with no periodic source (vision, churn, stakeholder map, learning insights, concept pages) have no contract and keep the plain staleness check.",
+  "sourceGraceDays": 3,
+  "refreshContracts": [
+    { "path": "2_AREAS/{{ORG}}/context/metrics_dashboard.md", "source": "the PowerBI weekly {{PRODUCT}} report", "sourceEveryDays": 7, "confirms": "the Data team (Head of Data)" },
+    { "path": "2_AREAS/{{ORG}}/_metrics/registry.yaml", "source": "the PowerBI weekly {{PRODUCT}} report", "sourceEveryDays": 7, "confirms": "the Data team (Head of Data) and each metric's owner" },
+    { "path": "2_AREAS/{{ORG}}/context/cy27_objectives.md", "source": "Productboard objectives and KRs", "sourceEveryDays": 91, "confirms": "the Head of Product {{PRODUCT}}" },
+    { "path": "2_AREAS/{{ORG}}/context/strategic_context.md", "source": "the quarterly {{PRODUCT}} strategy / QBR deck", "sourceEveryDays": 91, "confirms": "the Head of Product {{PRODUCT}}" },
+    { "path": "1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md", "source": "the {{PRODUCT}} cycle planning deck", "sourceEveryDays": 42, "confirms": "the Head of Product {{PRODUCT}}" },
+    { "path": "2_AREAS/{{ORG}}/context/company_context.md", "source": "{{ORG}} half-year and full-year results", "sourceEveryDays": 183, "confirms": "the {{PRODUCT}} product team, against {{ORG_LOWER}}.com/investors" },
+    { "path": "2_AREAS/{{ORG}}/context/travel_arranger_icp.md", "source": "the an earlier initiative Survey", "sourceEveryDays": 365, "confirms": "the {{PRODUCT}} product team (survey owner)" },
+    { "path": "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/partner_travel_trends_tracker.md", "source": "the {{PARTNER}} Business Travel Trends Tracker (per wave)", "sourceEveryDays": 183, "confirms": "the {{PRODUCT}} product team" }
+  ],
+  "_globComment": "Pattern-matched operational files. Project STATE.md files were never in the explicit list, so the file the loading model treats as a per-initiative single source of truth was outside the staleness check entirely. Globs mean a new initiative folder is covered the day it is created, without anyone remembering to register it.",
+  "operationalGlobs": [
+    { "pattern": "1_PROJECTS/{{ORG}}/*/STATE.md", "rhythm": "weekly" },
+    { "pattern": "1_PROJECTS/*/STATE.md", "rhythm": "biweekly" },
+    { "pattern": "2_AREAS/{{ORG}}/people/*.md", "rhythm": "quarterly" },
+    { "pattern": "3_RESOURCES/{{ORG}}/concepts/*.md", "rhythm": "quarterly" },
+    { "pattern": "2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/insights/*.md", "rhythm": "monthly" }
+  ],
+  "inbox": { "dir": "_private/0_INBOX", "maxAgeDays": 14, "exempt": ["README.md"] },
+  "skillsDir": "3_RESOURCES/AI Skills",
+  "skillsExemptFromRegistration": ["Interactive HTML Output"],
+  "deadPointerSources": ["memory_index.md"],
+  "_deadPointerDirsComment": "Before 2026-08-10 only memory_index.md and SKILL.md files were scanned for dead pointers, so a dangling reference inside a project STATE.md or a context file was structurally unreachable by the check — which is why the {{PILOT}} Artefacts/*.html pointer survived 10 days in a file whose whole job is to be trustworthy.",
+  "deadPointerDirs": ["1_PROJECTS", "2_AREAS", "_private/1_PROJECTS", "_private/2_AREAS"],
+  "_pointerExtensionsComment": "Artefact types that count as a checkable reference. .html was absent until 2026-08-10, so even scanning STATE.md would not have caught the {{PILOT}} pointer — two independent gaps had to line up for it to be missed.",
+  "pointerExtensions": ["md", "json", "sh", "mjs", "base", "canvas", "ps1", "html", "csv"],
+  "pathResolveBases": ["", "3_RESOURCES/"],
+  "_deadPointerExcludeSourcesComment": "Files that cite an EXTERNAL system's file layout as prose/research material, not vault links — flagging their backtick tokens as dead pointers was never meaningful. Scoped narrowly to the two subtrees inspected on 2026-08-10: the {{PILOT}} PRD Research Findings folder audits {{ORG}}'s actual product repo (src/, docs/, appsettings.json etc.); the chess-app prototype's SDD docs describe that prototype's own planned repo structure (docs/, evals/, src/), including unresolved template placeholders (TCK-###-slug, <date>). Added 2026-10-08 (history/obsolete material, excluded 2nd pass: memory-system-upgrade, {{PILOT}} Spec dev required files, {{PILOT}} Artefacts/_Obsolete*):  Home Automation docs (external repo layout), the 12 month vision pipeline (runtime output/ files, NN-<slug> placeholders, external Tools/ repo), and the watch/debloat/calibrate skills (generic third-party layouts and <placeholder> paths). Add new entries here rather than loosening isVaultPathToken further — the token shapes are indistinguishable from real vault paths, only the source's purpose tells them apart.",
+  "deadPointerExcludeSources": [
+    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Artefacts/06 PRD Research Findings/**",
+    "1_PROJECTS/{{ORG}}/12 month vision/**",
+    "1_PROJECTS/memory-system-upgrade/**",
+    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Release 3 PRD/sources/**",
+    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Spec dev required files/**",
+    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Artefacts/_Obsolete*",
+    "1_PROJECTS/Gas Town/reference/**",
+    "1_PROJECTS/Gas Town/templates/**",
+    "1_PROJECTS/Gas Town/audits/**",
+    "1_PROJECTS/Gas Town/docs/**",
+    "1_PROJECTS/Gas Town/LOG.md",
+    "1_PROJECTS/Gas Town/PLAN.md",
+    "1_PROJECTS/Gas Town/BRIEF.md",
+    "1_PROJECTS/Gas Town/OPEN_QUESTIONS.md",
+    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/LOG.md",
+    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Release 3 PRD/**",
+    "_private/1_PROJECTS/Working-prototypes/**",
+    "_private/1_PROJECTS/shared-repo-cutover/**"
+  ],
+  "excludeDirs": [".git", ".claude", ".obsidian", "4_ARCHIVE", "node_modules"],
+  "_deployedSkillMirrorsComment": "The vault lints itself, but nothing checked the skill copies that actually execute. DECIDED 2026-08-12: the vault is the source of truth for deployed skills. Two deployment surfaces exist and they need different checks, which is why each entry carries a mode. mode=copy means the deployed file should be byte-identical to the vault source (Claude Code, which reads real files off disk). mode=pointer means the deployed file is a thin loader that must NOT contain the skill body at all \u2014 it only has to name the vault path, so divergence is structurally impossible; used for claude.ai, where the deployed copy is an uploaded package with no readable path on this machine and therefore can never be diffed. An unreadable mirror reports amber, not silence. See 1_PROJECTS/Actions/deployed-skill-copies-diverged-from-vault.md.",
+  "deployedSkillMirrors": [
+    {
+      "name": "daily-slack-review (Claude Code, user scope)",
+      "mode": "copy",
+      "vault": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
+      "deployed": "~/.claude/skills/daily-slack-review/SKILL.md"
+    },
+    {
+      "name": "ingest (Claude Code, user scope)",
+      "mode": "copy",
+      "vault": "3_RESOURCES/AI Skills/ingest/SKILL.md",
+      "deployed": "~/.claude/skills/ingest/SKILL.md"
+    },
+    {
+      "name": "diff-propose (Claude Code, user scope)",
+      "mode": "copy",
+      "vault": "3_RESOURCES/AI Skills/diff-propose/SKILL.md",
+      "deployed": "~/.claude/skills/diff-propose/SKILL.md"
+    },
+    {
+      "name": "daily-slack-review (claude.ai uploaded package)",
+      "mode": "pointer",
+      "vault": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
+      "deployed": "3_RESOURCES/AI Skills/daily-slack-review/DEPLOY/claude-ai-loader/SKILL.md"
+    },
+    {
+      "name": "ask-pilot (claude.ai uploaded package)",
+      "mode": "pointer",
+      "vault": "3_RESOURCES/AI Skills/ask-pilot/SKILL.md",
+      "deployed": "3_RESOURCES/AI Skills/ask-pilot/DEPLOY/claude-ai-loader/SKILL.md"
+    }
+  ],
+
+  "_privateBoundaryComment": "Two vaults (added 2026-11-13). This folder is the shared vault. The private vault is a separate folder outside the repo, mounted here as a gitignored symlink. Check 9: must-fix if the mount is not gitignored; should-fix (leakSeverity) if a shared content file names a specific private file. Set leakSeverity to red before a vault is shared. Naming a private folder by convention is allowed. Engine files (index, AGENTS, skills) are exempt until the team version generalises them.",
+  "privateBoundary": {
+    "mount": "_private",
+    "leakSeverity": "amber",
+    "contentDirs": ["1_PROJECTS", "2_AREAS", "3_RESOURCES/{{ORG}}"]
+  },
+
+  "_stateBudgetsComment": "Field budgets for STATE files (check 8, added 2026-10-29). Mirrors diff-propose/SKILL.md 'STATE is a snapshot, not a history'; change both together. strictFiles are diff-propose pilots and report must-fix; other glob matches report should-fix because they use the pre-budget schema. Word counts exclude the bullet marker.",
+  "stateBudgets": {
+    "strictFiles": ["1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/STATE.md"],
+    "globs": ["1_PROJECTS/{{ORG}}/*/STATE.md"],
+    "fields": {
+      "Right now": { "maxBullets": 6, "maxWords": 40 },
+      "Next decision needed": { "maxBullets": 6, "maxWords": 40 },
+      "Blocker": { "maxBullets": 3 },
+      "Risks": { "maxBullets": 12, "maxWords": 30 },
+      "Last 3 material events": { "exactBullets": 3 }
+    }
+  },
+
+  "_runIntegrityComment": "Checks that the pipeline actually RAN, not just that its output was well-formed. The 10\u201312 Aug drift was invisible because a stale deployed copy produced a plausible chat answer and wrote no file at all \u2014 nothing malformed to catch. Absence is the signal. graceWeekdays=1 means: by the end of the next weekday, a valid brief for the previous weekday must exist somewhere in searchDirs (inbox before processing, archive after). expectedVersion is read live from the vault SKILL.md frontmatter, so bumping the skill version automatically invalidates output from an older copy.",
+  "runIntegrity": [
+    {
+      "name": "daily-slack-review",
+      "sourceSkill": "3_RESOURCES/AI Skills/daily-slack-review/SKILL.md",
+      "artifactPattern": "_slack-review.md",
+      "searchDirs": ["_private/0_INBOX", "_private/4_ARCHIVE"],
+      "weekdaysOnly": true,
+      "graceWeekdays": 1,
+      "footerRe": "Run provenance[\\s\\S]{0,120}?daily-slack-review` v([0-9]{4}-[0-9]{2}-[0-9]{2}\\.[0-9]+)"
+    }
+  ],
+
+  "_factsComment": "PLAN S2.4 (2026-11-22). Typed facts: one file per fact in <Initiative>/facts/, template 3_RESOURCES/framework/templates/FACT.template.md. Check 11: must-fix if a required field is missing, the type is unknown, the status is not valid for the type, or a date is malformed. Should-fix if a live fact (status in `live`) has verified 'not yet' or older than freshnessDays for its type. Closed facts (superseded, retired, answered, dropped) are history and are not aged.",
+  "facts": {
+    "glob": "1_PROJECTS/**/facts/*.md",
+    "required": ["type", "claim", "source", "as_of", "verified", "status"],
+    "types": {
+      "decision": ["active", "superseded"],
+      "constraint": ["active", "retired"],
+      "open-question": ["open", "answered", "dropped"]
+    },
+    "live": ["active", "open"],
+    "freshnessDays": { "decision": 180, "constraint": 90, "open-question": 30 },
+    "_verifiedPointerComment": "{{OWNER}}, 2026-11-22: verified means a person checked, or a source can be pointed to directly (metric, Slack message, Google Doc) that states the fact or confirms it correct. A dated `verified` needs `source` to match this: a URL, a Jira/Productboard key (ABC-123), `metric:<registry id>`, or `Checked by <Name>`. Definition text: FACT.template.md.",
+    "verifiedPointer": "https?://|\\b[A-Z][A-Z0-9]+-\\d+\\b|metric:[a-z0-9_.]+|[Cc]hecked by [A-Z]"
+  },
+
+  "_largeFilesComment": "Audit item 12. Amber for .md files over maxKB in dirs. allow = kept sources an agent reads by section (AGENTS.md rule), not working files.",
+  "largeFiles": {
+    "maxKB": 50,
+    "dirs": ["1_PROJECTS", "2_AREAS"],
+    "allow": ["**/Artefacts/**", "**/sources/**", "**/LOG.md"]
+  }
+}

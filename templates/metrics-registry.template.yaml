@@ -1,0 +1,3 @@
+# Metrics registry. The only file where a metric value may change.
+# See _metrics/README.md and METRICS_PROTOCOL.md for the format and the checker.
+metrics: {}

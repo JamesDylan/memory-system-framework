@@ -1,0 +1,33 @@
+{
+  "vault": "memory_system",
+  "description": "{{ORG}} PM shared memory system — PARA-structured Obsidian vault, external business brain for {{ORG}} product managers ({{PRODUCT}}).",
+  "_qmdComment": "Changed 2026-10-29 from the named index 'memory_system' to qmd's default index, so bare `qmd` CLI calls and the MCP server read the same store. The canonical qmd config (collection, ignores, per-folder contexts) lives in ~/.config/qmd/index.yml, outside the repo; see 3_RESOURCES/AI Skills/.agents/skills/qmd/SKILL.md for how to rebuild it.",
+  "qmd_index": "index",
+  "qmd_collection": "memory_system",
+  "qmd_config": "~/.config/qmd/index.yml",
+  "qmd_excludes": [
+    "_private/**",
+    "4_ARCHIVE/**",
+    ".claude/**",
+    ".obsidian/**",
+    "node_modules/**"
+  ],
+  "vaults": {
+    "_comment": "Two vaults, same PARA shape (2026-11-13). Paths in docs and skills are relative to the shared vault root; private paths start with the mount name.",
+    "shared": {
+      "path": ".",
+      "write": "reviewed",
+      "holds": "company context, project status, concepts, processes, engine"
+    },
+    "private": {
+      "path": "../memory_private",
+      "mount": "_private",
+      "write": "direct",
+      "holds": "people and coaching, career, personal areas and projects, inbox, raw Slack pulls, own actions"
+    }
+  },
+  "qmd_collections": [
+    "memory_system",
+    "memory_private"
+  ]
+}

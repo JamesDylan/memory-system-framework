@@ -1,0 +1,16 @@
+{
+  "ORG": "Acme",
+  "PRODUCT": "Widgets",
+  "PRODUCT_LONG": "Acme Widgets for Teams",
+  "PARTNER": "PartnerCo",
+  "OWNER_NAME": "Sam Example",
+  "OWNER": "Sam",
+  "USER_ID": "samexample",
+  "OWNER_SLACK_ID": "U00000000",
+  "SLACK_WORKSPACE": "acme",
+  "PILOT_INITIATIVE": "Example Initiative",
+  "PILOT": "Example",
+  "SECOND_PILOT": "Second Example",
+  "SHARED_VAULT_PATH": "~/vaults/acme/memory_system",
+  "PRIVATE_VAULT_PATH": "~/vaults/acme/memory_private"
+}

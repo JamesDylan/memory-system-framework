@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Read(/__VAULT__/1_PROJECTS/**)",
+      "Read(/__VAULT__/2_AREAS/**)",
+      "Read(/__VAULT__/3_RESOURCES/**)",
+      "Edit(/__SEATDIR__/.out/note.txt)",
+      "mcp__qmd__query", "mcp__qmd__get", "mcp__qmd__multi_get", "mcp__qmd__status"
+    ],
+    "deny": [
+      "Read(/__VAULT__/**/_private/**)",
+      "Read(/__VAULT__/_private/**)",
+      "Read(/__VAULT__/4_ARCHIVE/**)",
+      "WebFetch", "WebSearch", "Agent", "Workflow"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Edit|Write|MultiEdit|Bash|mcp__slack__.*",
+        "hooks": [{ "type": "command", "command": "/usr/bin/python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.py\"" }]
+      }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+2_AREAS/{{ORG}}/_metrics/history.csv merge=union
+2_AREAS/{{ORG}}/_metrics/health.csv merge=union
+CHANGELOG.md merge=union

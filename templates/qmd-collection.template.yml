@@ -1,0 +1,16 @@
+# qmd collection for the private vault. Copy to memory_private/qmd-collection.yml (README Step 5).
+# .scripts/qmd-bootstrap.sh reads it, fills in __PRIVATE__ and adds it under `collections:`. Keep the two-space indent.
+# Context keys use qmd SLUG paths: '_' and spaces become '-' (1_PROJECTS/Actions -> 1-PROJECTS/Actions).
+  memory_private:
+    path: __PRIVATE__
+    pattern: "**/*.md"
+    ignore:
+      - 0_INBOX/**
+      - 4_ARCHIVE/**
+    context:
+      "": >-
+        The user's private vault. Holds what must not be shared: people and coaching notes, career, personal areas and projects,
+        raw Slack pulls and the user's own actions. Paths here appear in the shared vault's docs with the prefix _private/.
+      1-PROJECTS/Actions: >-
+        The user's own open actions, one markdown file per action, with frontmatter (status, due, initiative, owner, source).
+        status: done means closed. Use this for 'what is outstanding' or 'what am I chasing'.

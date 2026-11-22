@@ -1,0 +1,40 @@
+# qmd config for both vaults. ~/.config/qmd/index.yml is a symlink to this file;
+# run .scripts/qmd-bootstrap.sh on a new machine. Edit here, then `qmd update`.
+# Context keys use qmd's slug paths: '_' and spaces become '-', a leading '_' is dropped.
+
+collections:
+  memory_system:
+    path: {{SHARED_VAULT_PATH}}
+    pattern: "**/*.md"
+    ignore:
+      - _private/**
+      - 4_ARCHIVE/**
+      - .claude/**
+      - .obsidian/**
+      - node_modules/**
+    context:
+      "": >-
+        {{OWNER_NAME}}'s shared work vault ({{ORG}}, {{PRODUCT}}). One canonical file per fact;
+        memory_index.md routes fact types to files. Check 'Last verified accurate' stamps.
+      AGENTS.md: >-
+        Entry point for any AI agent: how to search, where canonical facts live, and the read/write rules.
+      memory-index.md: >-
+        MASTER ROUTER. Read first. Single-source-of-truth table, file map, update rules.
+      1-PROJECTS/{{ORG}}: >-
+        One folder per committed project. _ACTIVE_CYCLE.md is canonical for the current cycle.
+        Each project uses STATE.md (current snapshot), BRIEF.md (why and scope) and LOG.md (history).
+      2-AREAS/{{ORG}}/context: >-
+        Standing context: strategy, metrics, stakeholders, company.
+      3-RESOURCES/AI-Skills: >-
+        Skills: instructions for running this vault. Not facts about {{ORG}}.
+
+  memory_private:
+    path: {{PRIVATE_VAULT_PATH}}
+    pattern: "**/*.md"
+    ignore:
+      - 0_INBOX/**
+      - 4_ARCHIVE/**
+    context:
+      "": >-
+        {{OWNER_NAME}}'s private vault: people and coaching, career, personal projects, own actions.
+        Paths here appear in the shared vault's docs with the prefix _private/.
