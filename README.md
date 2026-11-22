@@ -1,4 +1,4 @@
-# Memory system framework
+# An Agentic Memory System That Shares Context Within A Team
 
 **This repo is the engine, not a vault.** It holds the scripts, rules and AI agent skills that run a memory system. It holds no notes and no data. One setup command builds the vaults (folders of Markdown notes) that the engine runs on. That is why you don't see the `0_INBOX` … `4_ARCHIVE` folders here.
 
