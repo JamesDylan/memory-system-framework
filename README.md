@@ -1,54 +1,136 @@
 # An Agentic Memory System That Shares Context Within A Team
 
-**Shared, self-maintaining context for a product team and its AI agents.**
+**A shared memory for a product team that agents keep current, check and correct. People decide. Agents maintain.**
 
-A product team's knowledge is spread across Slack, meetings, documents, tickets and people's heads. Every time you ask an AI agent for help, it starts from nothing, or from whatever you paste in. This framework gives that knowledge one home that the whole team shares, keeps it current, and gives every agent the same accurate starting point.
+A product team's knowledge is spread across Slack, meetings, documents, tickets and people's heads. Every time you ask an AI agent for help, it starts from nothing, or from whatever you paste in. This framework gives that knowledge one home that the whole team shares. Scheduled agents feed it, file into it, check it against the original sources and fix what drifts. Every agent and every person starts from the same accurate picture.
 
-> **This repo is the engine, not a vault.** It holds the scripts, rules and agent skills. It holds no notes and no data. One setup command builds the vaults (folders of plain Markdown notes) that the engine runs on.
+You can run all of it by hand, one prompt at a time, and add agents one job at a time. Every job below works both ways.
+
+> **This repo is the engine, not a vault.** It holds the scripts, rules, agent skills and agent templates. It holds no notes and no data. One setup command builds the vaults (folders of plain Markdown notes) that the engine runs on.
+>
+> **The agent layer is running in the author's private vault today** and moves into this repo shortly. Here now: the skills, the checks, CI and the template for a scheduled agent (`templates/seat/`). Coming across: the running agents, the dispatcher and the eval harness. See [What runs today](#what-runs-today).
 
 ## Why use it
 
 | | What you get | Status |
 |---|---|---|
 | 1 | **Cheaper, sharper agents.** Agents read one small, current file instead of re-reading Slack, Drive and old threads every time. Answers cost less, arrive faster and come with a source. | Working today |
-| 2 | **Context that maintains itself.** Agents pull in what changed, propose updates for you to approve, and flag what has gone stale. Your job shrinks to saying yes or no. | Partly built |
-| 3 | **One truth for the whole team.** The shared vault is a git repo. Everyone, and every agent, works from the same facts. Personal notes stay in a separate private vault. | Working today |
+| 2 | **Context that maintains itself.** Agents on a schedule pull in what changed, propose updates in Slack for a ✅ or ❌, and flag what has gone stale. Your job shrinks to deciding. | Partly built |
+| 3 | **One truth for the whole team.** The shared vault is a git repo. Everyone, and every agent, works from the same facts. Agents change it only through checked pull requests. Personal notes stay in a separate private vault. | Working today |
 | 4 | **Projects become harnesses.** Each project holds its sources, decisions and current state. Agent work on that project starts from the right information and writes what it learns back. | Piloting |
-| 5 | **Shared skills and pipelines.** The team shares one set of agent skills. Pipelines can run discovery, write requirements and report experiments, step by step, from the project's own facts. | Planned |
+| 5 | **Shared skills and pipelines.** The team shares one set of agent skills. Pipelines run discovery, write requirements and report experiments, stage by stage, from the project's own facts. | Planned |
 
-### 1. Cheaper, sharper agents
+## How it runs
 
-- **Ask "where is project X now?"** and get one current answer, with its source, from one file.
-- **Search first, read one file.** Local search finds the right note, so an agent reads a few thousand words, not a week of Slack.
-- **Right model for the job.** Scheduled agents name their model and a cost ceiling per run. Routine jobs run on the cheapest model that passes its checks.
-- **Measured, not assumed.** A weekly health row tracks freshness and upkeep, so you can see whether it pays for itself. In the author's use, keeping project status current fell from 40+ minutes a day to 5–10.
+```text
+ ORIGINALS       Slack · meetings · Drive · Jira · Productboard · BI dashboards
+     │   agents capture on a clock (no new input: no model run, no cost)
+     ▼
+ INBOX           raw input, kept and never deleted
+     │   agents route each fact to its one home and propose the change
+     ▼
+ YOU             ✅ or ❌ in Slack, or in a review card in your agent
+     │
+     ▼
+ KNOWLEDGE       one file per fact: project STATE, decisions, metrics, concepts
+     │   pipelines read only what they need ─────────►  WORK: discovery, PRD, experiments
+     │                                                      │  learnings promoted back,
+     │   ◄──────────────────────────────────────────────────┘  for your ✅
+     ▼
+ QUALITY LOOP    scripts check structure daily; agents check facts against
+                 their source weekly; fixes arrive as PRs; your "no" becomes a rule
+```
 
-### 2. Context that maintains itself
+Four rules keep it safe to automate:
 
-- **Capture runs on its own.** Slack and meeting notes are pulled into an inbox every day.
-- **The agent files; you approve.** Each fact goes to its one home as a proposed change. You approve or reject it in a review card.
-- **Problems surface early.** A daily check finds stale pages, broken links, numbers that disagree and facts with no owner, and names who should fix each one.
-- **It learns from your "no".** When you reject the same kind of change three times, it proposes a rule so it stops making that mistake.
-- **Built today:** daily capture, filing with approval, daily and CI checks, the health row. **Next:** agents that refresh stale project pages and check facts against their source each week (see [Roadmap](#roadmap)).
+- **One fact, one file.** Each fact has exactly one home, so an agent never has to pick between two copies.
+- **Capture is messy; filing is deliberate.** Raw input lands in an inbox first. Only approved facts reach the real notes.
+- **Agents propose; people decide.** Pulls, syncs, fixes and drafts are automatic. Scope, bets, approvals and judgment about people stay with a person.
+- **Plain Markdown and git.** It works in Obsidian, any editor and any agent that can read files. Every change is a diff you can read and revert.
 
-### 3. One truth for the whole team
+## Every job, by hand or by agent
 
-- **Host it on GitHub.** The shared vault is a normal git repo. Changes arrive as pull requests, checked before they merge.
-- **Same answer for everyone.** A new PM, a stakeholder's question or an agent in any tool gets the same facts, from the same file.
-- **Private stays private.** Notes about people, your career and raw captures live in a private vault on your machine. A check stops shared notes from pointing at private ones.
-- **No lock-in.** Plain Markdown works in Obsidian, any editor, and any agent that can read files.
+| Job | By hand | With agents |
+|---|---|---|
+| **Capture** Slack, meetings, docs | Paste into `_private/0_INBOX/`, or ask your agent to "run my daily Slack review" | Meeting agent picks up each new transcript within 15 minutes. Daily Slack pull. Spec sync from Drive *(next)* |
+| **File** each fact in its home | Ask your agent to "process my inbox" (`ingest`) | The capturing agent routes it and drafts the change itself |
+| **Approve** changes | Review cards in your agent | ✅ or ❌ on the agent's Slack thread. Reply to edit. A script applies your decision, no model needed |
+| **Start a project** | Copy the templates | Reply `project <Name>` in Slack. The dispatcher builds the folder and asks you to confirm |
+| **Keep project status current** | Edit `STATE.md` | Agents draft field-level changes from meetings today, and from Slack and tickets for stale projects *(next)* |
+| **Record results and KPIs** | Edit the insight or metric file | Experiment agent files each strong result daily. KR feed proposes changes from Productboard weekly *(built)* |
+| **Share team updates** | Write the summary | Team-meeting agent drafts it for a ✅, then publishes to a Slack canvas *(built)* |
+| **Health check** | Run `lint`, read the report | Daily on your machine and on every PR in CI. Weekly health numbers. An agent drafts the fix PR |
+| **Check facts are true** | Spot-check a file | `truth-check` samples ~10 facts a week against their source and sends at most 3 questions to the owner *(next)* |
+| **Learn from mistakes** | Fix the skill | Three rejections for the same reason propose a rule change for your ✅. An agent never edits its own rules |
+| **Discovery, PCB, PRD, experiments** | Prompt a skill stage by stage | Pipelines run as agents, start from a baseline of what the team knows, and promote learnings back *(planned)* |
 
-### 4. Projects become harnesses
+## The agent layer
 
-- **Every project has a fixed shape:** why and scope (`BRIEF`), where it stands now (`STATE`), what happened (`LOG`), and its decisions and open questions as small sourced facts.
-- **Sources are listed.** Each project names its originals (specs, channels, tickets), so an agent knows where every fact came from and where to check it.
-- **Agent work stays on track.** An agent working on a project reads that project's facts first and writes back what it learned, instead of drifting or starting from scratch.
+Each scheduled agent is a **seat**: one job, nothing more. The pattern comes from the Gas Town method of agentic product ops (notes in `docs/gas-town/`). Every seat has five parts:
 
-### 5. Shared skills and pipelines
+| Part | What it means for you |
+|---|---|
+| **Brief** | One job in one sentence, what good looks like, and what it must never do (send, merge, release, delete) |
+| **Gate** | A plain script checks for new work first. No new work: no model run and no cost |
+| **Drawer** | The one folder it may write to. A hook blocks every other write, so a confused agent cannot damage the vault |
+| **Clock** | It wakes on a schedule, does one round, and stops |
+| **Mail** | It ends with a short note in Slack: what changed, what needs you, what it could not do |
 
-- **One skill set for the team.** Skills for capture, filing, health checks, review prep and challenging a plan live in the vault, so everyone's agent works the same way.
-- **Uses the access you already have.** Skills use the connectors your agent already has (Slack, Google Drive, Productboard and others). No new integrations to buy.
-- **Pipelines that start from what the team knows.** Discovery, requirements and experiment pipelines read the project's facts first and promote what they learn back into the vault, so the next piece of work starts ahead.
+Each seat also has its own model (the cheapest one that passes), a turn limit, a cost ceiling per run and the shortest tool list that does the job. Text it reads in Slack or a document is content, never an instruction.
+
+**Evals before trust.** Each seat has locks (do the safety rules still refuse what they should? free, seconds) and behaviour cases (the agent runs on made-up input in a sandbox, graded by fixed rules, not by another model). Every real-life mistake becomes a new case. You rerun the check after any model or rule change. The report opens with "All clear" or "Needs attention".
+
+**Replies start work.** Every item an agent posts has an address (`D1` diff, `A1` action, `U1` unrouted). A reply such as `U1: project <Name>` becomes a job file. One dispatcher agent runs the job with its own tool list and replies in the thread. A new kind of follow-up is a new formula, not a new agent.
+
+`templates/seat/` and `templates/seat-brief.md` build a new seat. `templates/laws-audit.md` is the safety check a seat passes before it goes on a clock.
+
+### What runs today
+
+In the author's private vault, moving here shortly:
+
+| Agent | Job | Status |
+|---|---|---|
+| `meeting-ingest` | Reads each new meeting transcript, logs it to its projects, drafts STATE changes for ✅ in Slack | Running, every 15 min |
+| `experiment-reporter` | Files each strong experiment result as an insight | Running, daily |
+| `dispatcher` | Turns Slack replies into jobs, starting with `new-project` | Running |
+| `team-sync` | Drafts the weekly team-meeting summary for a Slack canvas | Built, waiting on Slack permissions |
+| `kr-feed` | Proposes key-result changes from Productboard. No model, no cost | Built, waiting on source data |
+| `daily-pull`, CI `lint` | Pull, check and report every day and on every PR | Running (in this repo) |
+| Evals | Locks and behaviour cases for each model-run seat | Running |
+
+In the author's use, keeping project status current fell from 40+ minutes a day to 5–10.
+
+## Self-sustaining and self-correcting
+
+The goal is a vault that keeps itself true with about 10 minutes of a person's time a week. The weekly quality loop does it:
+
+1. **Sort every finding by who acts.** Agents fix the mechanical ones (dead links, missing stamps, a synced copy out of date). Agents propose the rest for the owner's ✅. Only real judgment reaches a person, at most 3 asks per owner per week.
+2. **Check facts against the source.** An agent samples facts each week and marks each one supported, contradicted or unclear. The result is the **truth rate**.
+3. **Corrections become tests.** Each correction you make becomes a test question with the right answer. Each project has 10 or more, run weekly.
+4. **Track numbers, not lists.** One health file holds truth rate, test score, fresh sources, upkeep minutes and cost per question. The weekly digest leads with them.
+5. **Rules improve from rejections.** The same reason for a "no", three times in ten sessions, proposes one rule change.
+6. **Prune.** Each month, checks and agents that led to no action are demoted or removed, so the system gets simpler as it grows.
+
+**Guard measures.** The system must not get better at the cost of these: truth rate 90% or more, test score 8 of 10 or more, owner upkeep 10 minutes a week or less, cost per question falling or flat, and no disproved idea coming back without new evidence.
+
+## One ecosystem: memory, agents and pipelines
+
+Three parts work together. None is rebuilt by the others.
+
+| Part | Gives | Where |
+|---|---|---|
+| **The memory system** | Shared facts, one home each, with sources and stamps | This engine, and the vaults it builds |
+| **The agents (seats)** | Work on a clock, with hard limits, locks and evals | Private vault today; this repo shortly |
+| **The pipelines** | Discovery, PCB, one-pager and PRD stages, a prototype kit and a "twin" of the product on made-up data | The team's discovery lab repo |
+
+Joined, they work like this:
+
+- **Pipelines run as seats.** A stage starts by itself when its gate is mechanical (the previous output exists and passes its checks). A person starts it when the gate is judgment. You see only the decisions.
+- **Every pipeline starts from memory.** A first stage writes a one-page baseline from what the team already knows, including ideas already disproved. You write a one-line hypothesis before you read it.
+- **Every pipeline ends in memory.** A last stage proposes its decisions and learnings back to the vault for your ✅, so the next piece of work starts ahead.
+- **Designs stay buildable.** Agents build designs in the twin. A check confirms each design uses only services that exist in production.
+- **One validation system.** Seats and pipeline stages share one report shape, so a change cannot ship with a broken contract or a removed safety rule.
+- **One engine for many PMs.** A fix to the seat template or the checks reaches every PM's agents. Nobody needs the author to set them up.
 
 ## Roadmap
 
@@ -57,26 +139,19 @@ The order is fixed by evidence: each stage starts when the one before it shows a
 | Stage | What it adds | Outcome for you | Status |
 |---|---|---|---|
 | **Measure** | Baseline cost and time per task; weekly health numbers; skill scorecards; typed, sourced facts | You can see whether the system is getting more accurate and cheaper | Mostly done |
-| **Project harness pilot** | One project where facts come from listed sources, not hand copies. Specs sync from Google Drive. A weekly truth check samples facts against their source | Answers follow the live spec, and accuracy is a number, not a feeling | In progress |
-| **Self-maintaining agents** | Scheduled agents with a fixed job, model and cost cap: `truth-check`, `state-refresh`, `spec-sync`. Each has evals and posts a short note for approval in Slack | Project pages stay current without anyone copying status by hand | Next |
-| **Pipelines** | One template for every pipeline stage, with its own checks and evals. Discovery, memory upkeep and experiment loops built on it | Discovery starts from what the team knows, and costs less per run | Planned |
-| **Active layer** | New projects start from a template and a baseline brief. Agents route "help me write the PRD" to the right pipeline. Process gates checked in CI | No project starts from a blank page, in any AI tool | Planned |
-| **Scale and automate** | Every live project on the harness. Agents maintain the vault through pull requests. Routine facts auto-apply once proven safe. Changed skills are replayed against past sessions before they go live. Unused checks and skills are pruned monthly | The system gets cheaper and simpler as it grows, not heavier | Planned |
+| **Project harness pilot** | One project where facts come from listed sources, not hand copies. Specs sync from Drive. A weekly truth check | Answers follow the live spec, and accuracy is a number, not a feeling | In progress |
+| **Next agents** | `truth-check` (truth rate for the pilot), `state-refresh` (stale project pages refreshed from Slack and tickets), `spec-sync` (Drive copies kept current). Agent layer moves into this repo | Project pages stay current without anyone copying status by hand | Next |
+| **Pipelines** | One stage template with its own checks and evals. Memory upkeep, discovery and the experiment loop rebuilt as stages and run as seats | Discovery starts from what the team knows, and costs less per run | Planned |
+| **Active layer** | New projects start from a template and a baseline. "Help me write the PRD" routes to the right pipeline in any AI tool. Process gates checked in CI, with a visible skip | No project starts from a blank page | Planned |
+| **Scale and automate** | Every live project on the harness. All agents maintain the vault through PRs. Routine facts auto-apply once proven safe. Changed skills replayed against past sessions before they go live. Monthly pruning | A week passes with no manual run, and the system gets simpler as it grows | Planned |
 
 What keeps it cheap and accurate along the way:
 
-- **Scripts before models.** Structure checks, health numbers and scorecards are plain scripts. A model runs only where judgment is needed.
-- **Evals before trust.** Each scheduled agent has test cases and a pass bar before it runs on its own. Auto-apply waits for a proven clean rate.
+- **Scripts before models.** Gates, checks, health numbers and applying your ✅ are plain scripts. A model runs only where judgment is needed.
+- **Evals before trust.** No seat goes on a clock without locks, cases and a safety audit. Auto-apply waits for a proven clean rate.
 - **Hard limits.** Every agent has a turn limit, a cost ceiling, a short tool list and one folder it may write to.
+- **Uses the access you already have.** Skills and agents use the connectors your agent already has: Slack, Google Drive, Productboard and others.
 - **A tool earns its place.** A new agent or source is added only when it replaces a manual job with a measured cost.
-
-## How it works
-
-- **One fact, one file.** Each fact has exactly one home, so there is never a "which copy is right?" question. An index maps each type of fact to its file.
-- **Capture is messy; filing is deliberate.** Raw input goes to an inbox first. Only checked facts move into the real notes.
-- **The agent proposes; you approve.** Nothing important changes without a person saying yes.
-- **Checks are automatic.** Scripts check structure every day, without an AI. An agent checks meaning only when asked.
-- **Plain Markdown.** It works in Obsidian, in any editor and with any AI agent that can read files. You are not locked in.
 
 ## How to use it
 
@@ -98,9 +173,14 @@ What keeps it cheap and accurate along the way:
      4_ARCHIVE/
    ```
 
-2. **Every day:** drop raw material in `_private/0_INBOX/`, then ask your agent to "process my inbox". The `ingest` skill files each fact and shows you the changes to approve.
-3. **When you need an answer:** ask your agent. It searches first, reads the one canonical file, and tells you if the answer may be out of date.
-4. **Every week:** read the lint report and fix what it flags.
+2. **Every day, capture and file.**
+   - *By hand:* drop raw material in `_private/0_INBOX/`, or ask your agent to "run my daily Slack review". Then ask it to "process my inbox". The `ingest` skill files each fact and shows you the changes to approve.
+   - *With agents:* seats capture meetings and Slack on a clock and post their proposed changes to Slack. You react ✅ or ❌.
+3. **When you need an answer:** ask your agent, in any tool. It searches first, reads the one canonical file, cites the source, and tells you if the answer may be out of date.
+4. **Every week, keep it healthy.**
+   - *By hand:* read the lint report and fix what it flags.
+   - *With agents:* CI writes the health numbers and drafts a fix PR. You answer the few questions only you can answer.
+5. **Add agents one job at a time.** Pick the manual job that costs you most, build a seat for it from `templates/seat/`, pass its evals and safety audit, then put it on a clock.
 
 ## The model
 
@@ -185,7 +265,8 @@ Copy the skills you use to your agent's skills folder, or point it at `3_RESOURC
 ## Limits
 
 - Built and used by one person so far. A shared team vault is set up; use by a second PM is the next test.
-- Self-maintaining agents, project harnesses and pipelines are partly built or planned. The [Roadmap](#roadmap) says which.
+- The running agents, dispatcher and evals are in the author's private vault and not yet in this repo. Here today: the seat template and the CI checks. Project harnesses and pipelines are partly built or planned. The [Roadmap](#roadmap) says which.
+- Seats run on one person's Mac today (launchd). Where they run for a team is still open.
 - Skill text keeps its design history. Names of people, projects and systems were replaced with placeholders, so some examples read as generic.
 - The scheduled lint job is macOS only.
 - Skills assume an agent with file access and, for capture, a chat connector.
