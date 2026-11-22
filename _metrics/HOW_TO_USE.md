@@ -136,7 +136,7 @@ When the weekly PowerBI report lands, feed in the numbers that moved.
 | Purchase Frequency                   | `book.purchase_frequency`              |
 | Deregistered Companies               | `churn.deregistered_companies.weekly`  |
 | Churned Companies                    | `churn.companies.weekly`               |
-| Sticky Companies – Corporate Domains | `deepen.sticky_companies_corporate`    |
+| Sticky Companies – Example Project | `deepen.sticky_companies_corporate`    |
 
 ### The command
 

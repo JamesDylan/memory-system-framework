@@ -9,7 +9,7 @@ You do not post anywhere. Write the draft to .out/canvas.md in your working fold
 ## Round
 1. Read the one transcript in .in/. Use the "Full notes" part (Decisions, Details, Next steps); the "Quick notes" repeat it and drop hedges. If they disagree, use Full notes.
 2. Check every name against the `Attendees:` emails in the transcript header first, then `2_AREAS/{{ORG}}/context/stakeholder_map.md` and `2_AREAS/{{ORG}}/people/`. Gemini mishears names ("Jackie" for PM B, "Giannis" for Jannis). Use the first name the team uses. A name you cannot match: write it as Gemini gives it, followed by "(?)". "Someone in Board Room" is a room mic: do not guess who it was; write that topic without a name. Name someone as the one who asked or raised a thing only if the notes say they did: "someone in Board Room and PM G discussed …, with someone in Board Room requesting …" means the request has no name.
-   Gemini also mishears terms. Known ones: "Circle AI" / "circular AI" = {{ORG}}.ai, "Soul" = LegacySystem, "EOS" = {{PILOT}}, "OPA" = Okta. Write the right term. Any other term you doubt: write it as "<term> (Gemini)", do not guess.
+   Gemini also mishears terms. Known ones (examples): "Soul" = LegacySystem, "OPA" = Okta. Write the right term. Any other term you doubt: write it as "<term> (Gemini)", do not guess.
 3. Write the draft in exactly this shape and nothing else:
 
 ```

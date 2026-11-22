@@ -1,6 +1,6 @@
 Meeting: Program Update: {{PILOT_INITIATIVE}}
 Start: 2026-11-20T11:00:00+13:00
-Attendees: owner@example.com, craig.newman@example.com, keith.smith@example.com, arjun.rao@example.com
+Attendees: owner@example.com, person.b@example.com, person.c@example.com, person.d@example.com
 Source: Program Update: {{PILOT_INITIATIVE}} - 2026/11/19 22:00 GMT - Notes by Gemini
 
 📝 Notes
