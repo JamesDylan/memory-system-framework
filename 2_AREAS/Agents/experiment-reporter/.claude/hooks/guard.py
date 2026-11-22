@@ -45,17 +45,19 @@ def check(tool, a):
 
 
 def selftest():
+    import shutil, tempfile
+    global INSIGHTS
+    INSIGHTS = os.path.realpath(tempfile.mkdtemp())  # temp insights folder, so the test never writes into the vault
     new = INSIGHTS + "/zz-selftest-new-insight.md"
     assert not os.path.exists(new)
     assert check("Write", {"file_path": new, "content": "x"}) is None
     assert check("Edit", {"file_path": new, "old_string": "a", "new_string": "a\nb"})
-    existing = INSIGHTS + "/zz-selftest-existing.md"  # made here so the test runs in any vault, even an empty one
-    os.makedirs(INSIGHTS, exist_ok=True)
+    existing = INSIGHTS + "/zz-selftest-existing.md"
     open(existing, "w").close()
     try:
         assert check("Write", {"file_path": existing, "content": "x"})
     finally:
-        os.remove(existing)
+        shutil.rmtree(INSIGHTS)
     assert check("Write", {"file_path": INSIGHTS + "/sub/x.md", "content": "x"})
     assert check("Write", {"file_path": V + "/2_AREAS/{{ORG}}/{{ORG_LOWER}}_data/learning_insights.md", "content": "x"})
     assert check("Edit", {"file_path": V + "/README.md", "old_string": "", "new_string": "x"})

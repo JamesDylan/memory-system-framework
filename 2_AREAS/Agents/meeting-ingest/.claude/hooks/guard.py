@@ -47,11 +47,15 @@ def check(tool, a):
 
 
 def selftest():
+    import shutil, tempfile
+    global V, LOGS
+    V = os.path.realpath(tempfile.mkdtemp())  # temp vault root, so the test never writes into the real vault
+    LOGS = V + "/1_PROJECTS/{{ORG}}/*/LOG.md"
     assert check("Write", {"file_path": NOTE, "content": "x"}) is None
     assert check("Edit", {"file_path": V + "/README.md", "old_string": "", "new_string": "x"})
-    proj = V + "/1_PROJECTS/{{ORG}}/zz-selftest-project"  # made here so the test runs in any vault, even an empty one
+    proj = V + "/1_PROJECTS/{{ORG}}/zz-selftest-project"
     log = proj + "/LOG.md"
-    os.makedirs(proj, exist_ok=True)
+    os.makedirs(proj)
     open(log, "w").close()
     try:
         assert check("Edit", {"file_path": log, "old_string": "a", "new_string": "a\nb"}) is None
@@ -59,8 +63,7 @@ def selftest():
         assert check("Edit", {"file_path": proj + "/STATE.md", "old_string": "a", "new_string": "a\nb"})
         assert check("Edit", {"file_path": proj + "/sub/LOG.md", "old_string": "a", "new_string": "a\nb"})
     finally:
-        os.remove(log)
-        os.rmdir(proj)
+        shutil.rmtree(V)
     assert check("Write", {"file_path": SEAT + "/.out/pending/2026-11-14-x.json", "content": "{}"}) is None
     assert check("Write", {"file_path": SEAT + "/.out/pending/done/x.json", "content": "{}"})
     assert check("Write", {"file_path": V + "/1_PROJECTS/{{ORG}}/No Such Project/LOG.md", "content": "x"})
