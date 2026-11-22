@@ -151,7 +151,7 @@ in this folder's `runs.md` so the next run can compare.
 last quarter." Full corpus sweep. Pairs naturally with cycle planning — doctrine
 updates land before the next cycle's decisions are made.
 
-**B. The milestone autopsy.** A milestone lands (e.g. {{PILOT}} Phase 2 go-live): "Phase 2 is live — calibrate the
+**B. The milestone autopsy.** A milestone lands (e.g. a pilot initiative's Phase 2 go-live): "Phase 2 is live — calibrate the
 decisions that got us here." Corpus is that initiative's D-numbers/ADRs only.
 Runs while memory is fresh and feeds the retro (retro artefacts get
 their "what I'd decide differently" section from here, evidenced).

@@ -36,7 +36,7 @@ const cfg = JSON.parse(await readFile(join(ROOT, ".scripts/lint.config.json"), "
 
 // Extensions that count as a vault artefact reference. Configurable so adding a
 // new artefact type (html walkthroughs, csv exports) needs no code change — the
-// 2026-07-31 {{PILOT}} .html pointer went unchecked purely because .html wasn't here.
+// 2026-07-31 pilot-initiative .html pointer went unchecked purely because .html wasn't here.
 const POINTER_EXTS = cfg.pointerExtensions?.length
   ? cfg.pointerExtensions
   : ["md", "json", "sh", "mjs", "base", "canvas", "ps1"];
@@ -164,7 +164,7 @@ if (process.argv.includes("--selftest")) {
   ok(/>30d/.test(fi({ type: "open-question", status: "open", verified: "2026-10-01" }).stale), "fact: open question past 30d");
   ok(fi({ type: "open-question", status: "answered", verified: "2026-01-01" }).stale === null, "fact: closed facts do not age");
   ok(factIssues("no frontmatter", fc).errors[0] === "no frontmatter", "fact: no frontmatter");
-  const ses = (...chips) => "## Sessions\n\n| Date | Initiative | Versions (dp / ingest) | Reasons |\n|---|---|---|---|\n" + chips.map((c, i) => `| 2026-11-${String(10 + i).padStart(2, "0")} | {{PILOT}} | ${c[1] ?? "v1 / v1"} | ${c[0]} |\n`).join("");
+  const ses = (...chips) => "## Sessions\n\n| Date | Initiative | Versions (dp / ingest) | Reasons |\n|---|---|---|---|\n" + chips.map((c, i) => `| 2026-11-${String(10 + i).padStart(2, "0")} | Pilot | ${c[1] ?? "v1 / v1"} | ${c[0]} |\n`).join("");
   const hit = chipRule(parseSessions(ses(["wrong fact"], ["wording"], ["wrong fact ×2"], ["—"])));
   ok(hit.length === 1 && hit[0].chip === "wrong fact" && hit[0].count === 3 && hit[0].sessions.length === 2, "rejection loop: 3 of one chip fires, names chip and sessions");
   ok(!chipRule(parseSessions(ses(["wrong fact ×2"], ["wording"], ["none ×5"]))).length, "rejection loop: 2 of a chip, or `none`, does not fire");
@@ -562,7 +562,7 @@ async function checkRunIntegrity() {
 }
 
 // ── Check 8: STATE field budgets (snapshot, not history) ───────────────────
-// Added 2026-10-29. {{PILOT}} STATE grew to 12,055 words under diff-propose because the
+// Added 2026-10-29. The pilot initiative's STATE grew to 12,055 words under diff-propose because the
 // only size rule (a 200-word cap) lived in skill prose and nothing measured it.
 // Budgets are the ones in diff-propose/SKILL.md ("STATE is a snapshot, not a
 // history"). strictFiles (diff-propose pilots, whose contract these budgets are)
@@ -691,7 +691,7 @@ async function checkRejectionLoop() {
   const text = await readSafe(join(ROOT, SESSIONS));
   if (text === null) return;
   const hits = chipRule(parseSessions(text));
-  for (const h of hits) add("amber", "rejection-loop", `Reason chip \`${h.chip}\` occurs ${h.count} times in the last ${h.window} sessions of skill version ${h.version}: ${h.sessions.join("; ")}`, "Propose one change to the diff-propose or ingest rules that stops this chip. {{OWNER}} approves it like any diff; never edit the skill in the same pass");
+  for (const h of hits) add("amber", "rejection-loop", `Reason chip \`${h.chip}\` occurs ${h.count} times in the last ${h.window} sessions of skill version ${h.version}: ${h.sessions.join("; ")}`, "Propose one change to the diff-propose or ingest rules that stops this chip. The owner (`_private/ME.md`) approves it like any diff; never edit the skill in the same pass");
   if (!hits.length) add("green", "rejection-loop", "No reason chip occurs 3+ times in the last 10 sessions of any skill version");
 }
 await buildInventory();

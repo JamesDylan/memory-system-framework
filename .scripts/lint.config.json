@@ -6,7 +6,7 @@
     "monthly": 40,
     "quarterly": 100
   },
-  "_verificationComment": "How long a file may go without someone confirming its CONTENT is still true, as distinct from being edited. Deliberately looser than the edit thresholds — an actively-worked file is expected to be touched more often than it is re-read end to end. Added 2026-08-10 after {{PILOT}} STATE.md sat at 'Last verified accurate: 2026-08-07' while being touched daily, and lint reported it as fresh.",
+  "_verificationComment": "How long a file may go without someone confirming its CONTENT is still true, as distinct from being edited. Deliberately looser than the edit thresholds — an actively-worked file is expected to be touched more often than it is re-read end to end. Added 2026-08-10 after the pilot initiative's STATE.md sat at 'Last verified accurate: 2026-08-07' while being touched daily, and lint reported it as fresh.",
   "verificationThresholdsDays": {
     "weekly": 14,
     "biweekly": 28,
@@ -55,19 +55,15 @@
   "skillsDir": "3_RESOURCES/AI Skills",
   "skillsExemptFromRegistration": ["Interactive HTML Output"],
   "deadPointerSources": ["memory_index.md"],
-  "_deadPointerDirsComment": "Before 2026-08-10 only memory_index.md and SKILL.md files were scanned for dead pointers, so a dangling reference inside a project STATE.md or a context file was structurally unreachable by the check — which is why the {{PILOT}} Artefacts/*.html pointer survived 10 days in a file whose whole job is to be trustworthy.",
+  "_deadPointerDirsComment": "Before 2026-08-10 only memory_index.md and SKILL.md files were scanned for dead pointers, so a dangling reference inside a project STATE.md or a context file was structurally unreachable by the check — which is why the pilot initiative's Artefacts/*.html pointer survived 10 days in a file whose whole job is to be trustworthy.",
   "deadPointerDirs": ["1_PROJECTS", "2_AREAS", "_private/1_PROJECTS", "_private/2_AREAS"],
-  "_pointerExtensionsComment": "Artefact types that count as a checkable reference. .html was absent until 2026-08-10, so even scanning STATE.md would not have caught the {{PILOT}} pointer — two independent gaps had to line up for it to be missed.",
+  "_pointerExtensionsComment": "Artefact types that count as a checkable reference. .html was absent until 2026-08-10, so even scanning STATE.md would not have caught the pilot pointer — two independent gaps had to line up for it to be missed.",
   "pointerExtensions": ["md", "json", "sh", "mjs", "base", "canvas", "ps1", "html", "csv"],
   "pathResolveBases": ["", "3_RESOURCES/"],
-  "_deadPointerExcludeSourcesComment": "Files that cite an EXTERNAL system's file layout as prose/research material, not vault links — flagging their backtick tokens as dead pointers was never meaningful. Scoped narrowly to the two subtrees inspected on 2026-08-10: the {{PILOT}} PRD Research Findings folder audits {{ORG}}'s actual product repo (src/, docs/, appsettings.json etc.); the chess-app prototype's SDD docs describe that prototype's own planned repo structure (docs/, evals/, src/), including unresolved template placeholders (TCK-###-slug, <date>). Added 2026-10-08 (history/obsolete material, excluded 2nd pass: memory-system-upgrade, {{PILOT}} Spec dev required files, {{PILOT}} Artefacts/_Obsolete*):  Home Automation docs (external repo layout), the 12 month vision pipeline (runtime output/ files, NN-<slug> placeholders, external Tools/ repo), and the watch/debloat/calibrate skills (generic third-party layouts and <placeholder> paths). Add new entries here rather than loosening isVaultPathToken further — the token shapes are indistinguishable from real vault paths, only the source's purpose tells them apart.",
+  "_deadPointerExcludeSourcesComment": "Files that cite an EXTERNAL system's file layout as prose/research material, not vault links — flagging their backtick tokens as dead pointers was never meaningful. Scoped narrowly to the two subtrees inspected on 2026-08-10: the pilot initiative's PRD Research Findings folder audits {{ORG}}'s actual product repo (src/, docs/, appsettings.json etc.); the chess-app prototype's SDD docs describe that prototype's own planned repo structure (docs/, evals/, src/), including unresolved template placeholders (TCK-###-slug, <date>). Added 2026-10-08 (history/obsolete material, excluded 2nd pass: memory-system-upgrade, pilot Spec dev required files, pilot Artefacts/_Obsolete*):  Home Automation docs (external repo layout), the 12 month vision pipeline (runtime output/ files, NN-<slug> placeholders, external Tools/ repo), and the watch/debloat/calibrate skills (generic third-party layouts and <placeholder> paths). Add new entries here rather than loosening isVaultPathToken further — the token shapes are indistinguishable from real vault paths, only the source's purpose tells them apart. Entries for a vault's own pilot initiative are vault-specific and are not shipped with the engine.",
   "deadPointerExcludeSources": [
-    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Artefacts/06 PRD Research Findings/**",
     "1_PROJECTS/{{ORG}}/12 month vision/**",
     "1_PROJECTS/memory-system-upgrade/**",
-    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Release 3 PRD/sources/**",
-    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Spec dev required files/**",
-    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Artefacts/_Obsolete*",
     "1_PROJECTS/Gas Town/reference/**",
     "1_PROJECTS/Gas Town/templates/**",
     "1_PROJECTS/Gas Town/audits/**",
@@ -76,8 +72,6 @@
     "1_PROJECTS/Gas Town/PLAN.md",
     "1_PROJECTS/Gas Town/BRIEF.md",
     "1_PROJECTS/Gas Town/OPEN_QUESTIONS.md",
-    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/LOG.md",
-    "1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/Release 3 PRD/**",
     "_private/1_PROJECTS/Working-prototypes/**",
     "_private/1_PROJECTS/shared-repo-cutover/**"
   ],
@@ -123,9 +117,9 @@
     "contentDirs": ["1_PROJECTS", "2_AREAS", "3_RESOURCES/{{ORG}}"]
   },
 
-  "_stateBudgetsComment": "Field budgets for STATE files (check 8, added 2026-10-29). Mirrors diff-propose/SKILL.md 'STATE is a snapshot, not a history'; change both together. strictFiles are diff-propose pilots and report must-fix; other glob matches report should-fix because they use the pre-budget schema. Word counts exclude the bullet marker.",
+  "_stateBudgetsComment": "Field budgets for STATE files (check 8, added 2026-10-29). Mirrors diff-propose/SKILL.md 'STATE is a snapshot, not a history'; change both together. strictFiles are diff-propose pilots (vault-specific, so empty in the engine) and report must-fix; other glob matches report should-fix because they use the pre-budget schema. Word counts exclude the bullet marker.",
   "stateBudgets": {
-    "strictFiles": ["1_PROJECTS/{{ORG}}/{{PILOT_INITIATIVE}}/STATE.md"],
+    "strictFiles": [],
     "globs": ["1_PROJECTS/{{ORG}}/*/STATE.md"],
     "fields": {
       "Right now": { "maxBullets": 6, "maxWords": 40 },
@@ -160,7 +154,7 @@
     },
     "live": ["active", "open"],
     "freshnessDays": { "decision": 180, "constraint": 90, "open-question": 30 },
-    "_verifiedPointerComment": "{{OWNER}}, 2026-11-22: verified means a person checked, or a source can be pointed to directly (metric, Slack message, Google Doc) that states the fact or confirms it correct. A dated `verified` needs `source` to match this: a URL, a Jira/Productboard key (ABC-123), `metric:<registry id>`, or `Checked by <Name>`. Definition text: FACT.template.md.",
+    "_verifiedPointerComment": "Decided 2026-11-22: verified means a person checked, or a source can be pointed to directly (metric, Slack message, Google Doc) that states the fact or confirms it correct. A dated `verified` needs `source` to match this: a URL, a Jira/Productboard key (ABC-123), `metric:<registry id>`, or `Checked by <Name>`. Definition text: FACT.template.md.",
     "verifiedPointer": "https?://|\\b[A-Z][A-Z0-9]+-\\d+\\b|metric:[a-z0-9_.]+|[Cc]hecked by [A-Z]"
   },
 

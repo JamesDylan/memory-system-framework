@@ -28,7 +28,7 @@ A human reads `19.2%`. The checker reads the marker. Nothing else changes.
 
 ## If you are given a new number
 
-Run these from the vault root (`{{SHARED_VAULT_PATH}}`), using `/usr/bin/python3` —
+Run these from the vault root, using `/usr/bin/python3` —
 not bare `python3`, which on this machine has no PyYAML and can't install it (Homebrew's
 Python blocks `pip install` under PEP 668).
 

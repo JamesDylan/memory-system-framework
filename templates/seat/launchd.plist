@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- The seat's clock (macOS). Copy to ~/Library/LaunchAgents/com.{{USER_ID}}.__SEAT__.plist, then load it:
-     launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.{{USER_ID}}.__SEAT__.plist
+<!-- The seat's clock (macOS). Copy to ~/Library/LaunchAgents/com.__USER__.__SEAT__.plist, then load it:
+     launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.__USER__.__SEAT__.plist
      Keep ONE of the two schedules below. Add your node, qmd and claude folders to PATH if they live elsewhere. -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>Label</key><string>com.{{USER_ID}}.__SEAT__</string>
+  <key>Label</key><string>com.__USER__.__SEAT__</string>
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
@@ -18,8 +18,8 @@
   <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>0</integer></dict>
   -->
   <key>EnvironmentVariables</key>
-  <dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:{{HOME}}/.local/bin:/usr/bin:/bin</string></dict>
-  <key>StandardOutPath</key><string>{{HOME}}/.config/__SEAT__.launchd.log</string>
-  <key>StandardErrorPath</key><string>{{HOME}}/.config/__SEAT__.launchd.log</string>
+  <dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:__HOME__/.local/bin:/usr/bin:/bin</string></dict>
+  <key>StandardOutPath</key><string>__HOME__/.config/__SEAT__.launchd.log</string>
+  <key>StandardErrorPath</key><string>__HOME__/.config/__SEAT__.launchd.log</string>
 </dict>
 </plist>

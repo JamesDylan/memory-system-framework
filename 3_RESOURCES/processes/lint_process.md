@@ -12,7 +12,7 @@ This doc is the *operational* reference — when to run it, what the automation 
 | 1 — Mechanical | `.scripts/lint.mjs` | Zero agent tokens | Dead pointers, staleness vs. rhythm thresholds, missing stamps, unverified content, orphan skills, inbox age, index↔changelog drift, deployed-skill drift |
 | 2 — Judgment | Agent (Claude), on request | Agent tokens | Single-source-of-truth conflicts, semantic staleness (dates fresh but content wrong), missing/wrong structure, 2–3 questions worth investigating next |
 
-Phase 1 runs automatically every Monday 08:00 via launchd — see Automation below. Phase 2 only runs when {{OWNER}} explicitly asks Claude to lint / review / do the weekly vault check.
+Phase 1 runs automatically every Monday 08:00 via launchd — see Automation below. Phase 2 only runs when the owner (`_private/ME.md`) explicitly asks Claude to lint / review / do the weekly vault check.
 
 ## Running Phase 1 Manually
 
@@ -37,7 +37,7 @@ Three blind spots were closed on 10 Aug. All three were **configuration scope, n
 | Stamps | one collapsed value | `touched` and `verified` parsed separately, per-label |
 | Deployed skills | not checked | Check 6 in `lint.mjs` |
 
-**The case that prompted this.** A dangling `Artefacts/2026-07-31_phase2-scope-open-items.html` reference sat in {{PILOT}} `STATE.md` for 10 days. **Two independent gaps had to line up for it to survive**: `STATE.md` was not a scanned source, *and* `.html` was not a recognised extension. Either one alone would have caught it. This is why it read as a discipline failure and was not one.
+**The case that prompted this.** A dangling `Artefacts/2026-07-31_phase2-scope-open-items.html` reference sat in the pilot initiative's `STATE.md` for 10 days. **Two independent gaps had to line up for it to survive**: `STATE.md` was not a scanned source, *and* `.html` was not a recognised extension. Either one alone would have caught it. This is why it read as a discipline failure and was not one.
 
 **Why globs, not a longer list.** `operationalFiles` was hand-maintained, so a new initiative folder went unchecked until someone remembered to register it — the same failure mode the check exists to detect, one level up. Patterns mean a new `STATE.md` is in scope the day it is created.
 

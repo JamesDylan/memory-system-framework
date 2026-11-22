@@ -13,23 +13,24 @@ _metrics/
 ## Install
 
 ```bash
-mkdir -p {{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/_metrics
+mkdir -p <vault root>/2_AREAS/{{ORG}}/_metrics
 cp registry.yaml check_metrics.py METRICS_PROTOCOL.md \
-   {{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/_metrics/
+   <vault root>/2_AREAS/{{ORG}}/_metrics/
 pip3 install pyyaml          # only dependency
 ```
 
 Run it from the vault root:
 
 ```bash
-cd {{SHARED_VAULT_PATH}}
+cd <vault root>
 python3 2_AREAS/{{ORG}}/_metrics/check_metrics.py --root .
 ```
 
 Add an alias so it is one word:
 
 ```bash
-echo "alias metrics='python3 {{SHARED_VAULT_PATH}}/2_AREAS/{{ORG}}/_metrics/check_metrics.py --root {{SHARED_VAULT_PATH}}'" >> ~/.zshrc
+# run from the vault root: $PWD is filled in when you run echo
+echo "alias metrics='python3 $PWD/2_AREAS/{{ORG}}/_metrics/check_metrics.py --root $PWD'" >> ~/.zshrc
 ```
 
 ## The weekly loop
