@@ -240,6 +240,8 @@ Per-person values (your chat user ID, direct reports, watch list) live in `_priv
 
 Needs Python 3 and Node. Search needs qmd (`npm install -g @tobilu/qmd`).
 
+Easiest: open this folder in your agent and say "set me up". The `setup` skill asks a few questions, writes the answers file, builds the vaults and runs lint. To do it by hand:
+
 ```bash
 cp templates/answers.example.json answers.json   # edit it
 python3 init-vault.py answers.json

@@ -2,6 +2,10 @@
 
 Changes to the engine, by tag. A vault's own changes go in its root CHANGELOG.md; this file is the engine's, and `engine-upgrade.py` brings it along.
 
+## Unreleased
+
+- **`setup` skill.** Say "set me up" in the engine checkout: a staged interview (core five facts, then a yes/no per optional part), Slack IDs looked up through a connector, values shown for approval, then `init-vault.py` and lint. `AGENTS.md` "Not set up?" now points at it. ME.md gains `Role` and `Manager` from the answers file (`ROLE`, `MANAGER`); direct reports are optional.
+
 ## v0.1.0 — 2026-11-23
 
 The first tagged engine. A vault can now be installed from a tag, know which engine files it has changed, and upgrade.
