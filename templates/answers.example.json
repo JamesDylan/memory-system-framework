@@ -5,6 +5,8 @@
   "PARTNER": "PartnerCo",
   "OWNER_NAME": "Sam Example",
   "OWNER": "Sam",
+  "ROLE": "Product Manager",
+  "MANAGER": "Alex Lead",
   "USER_ID": "samexample",
   "OWNER_SLACK_ID": "U00000000",
   "SLACK_WORKSPACE": "acme",

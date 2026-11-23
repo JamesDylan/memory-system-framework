@@ -22,7 +22,8 @@ you write the answers file and run the engine's own scripts. Nothing here is new
 machinery: this skill only drives `init-vault.py` and `.scripts/lint.mjs`.
 
 Run it from the engine checkout (the folder with `init-vault.py`). The vaults are
-built in new, empty folders elsewhere.
+built in new, empty folders elsewhere. If there is no `init-vault.py` here, you are
+in a vault, not the engine: stop and say so.
 
 ## Interview rules
 
@@ -62,16 +63,20 @@ Keep a list of answers as you go. The key in brackets is the answers-file key.
   [`SHARED_VAULT_PATH`, `PRIVATE_VAULT_PATH`] Both folders must be new or empty.
 
 **Part 3 of 8: Slack** (yes/no)
-- "Do you use Slack for work, and do you want a daily Slack brief?"
+- "Do you want a daily brief of your work Slack? Say no if you don't use Slack for work."
 - Yes, and you have a Slack connector:
-  - Look up the user by name or email. Take their user ID [`OWNER_SLACK_ID`] and
-    the workspace name, the part before `.slack.com` [`SLACK_WORKSPACE`].
-  - List the channels they belong to, most active first. Let them pick by name
-    (they can search the list). Keep each picked channel's name and ID for Step 4.
-  - Show what you found and ask "Is this you?" (yes/no) before you use it.
-- Yes, no connector: ask the workspace name (fact, or later). Mark the user ID and
-  the channel list "to look up later". Do not ask for IDs.
-- No: leave the Slack keys unset.
+  - Look up the user by name or email with the connector's user search. Take their
+    user ID [`OWNER_SLACK_ID`]. Show the match and ask "Is this you?" (yes/no).
+  - Workspace [`SLACK_WORKSPACE`], the part before `.slack.com`: take it from a
+    permalink or profile the connector returns. If it returns none, mark it "to look
+    up later".
+  - Ask which channels they want in the brief, by name (fact). Find each with the
+    connector's channel search and confirm the match (yes/no). Keep each channel's
+    name and ID for Step 4. A channel you cannot find is "to look up later".
+- Yes, no connector: mark the user ID, the workspace and the channels "to look up
+  later". Do not ask for IDs.
+- No: leave the Slack keys unset. Tell the user that the Slack user ID and Chat
+  workspace lines on the "not filled in yet" list are expected and can be ignored.
 
 **Part 4 of 8: Direct reports** (yes/no)
 - "Do you manage anyone directly?" Yes: their names (fact). No: note "none".
@@ -98,7 +103,7 @@ Keep a list of answers as you go. The key in brackets is the answers-file key.
 ## Step 2 — Show the values for approval
 
 Show one table: every answers-file key with its value, then the extras that go into
-the vault after init (manager, direct reports, watch list, Slack channels). Mark
+the vault after init (direct reports, watch list, Slack channels). Mark
 each later value `later` and each missing ID `to look up later`. Ask "Write these?"
 (yes/no). On a correction, change that value and show the table again.
 
@@ -120,15 +125,23 @@ with `~`. Example:
 }
 ```
 
-Then run, from this engine checkout (`<parent>` is the vaults' parent folder):
+Create the parent folder first and write the file there. Then run, from this engine
+checkout (`<parent>` is the vaults' parent folder; keep the quotes, paths may hold
+spaces):
 
 ```bash
-python3 init-vault.py <parent>/answers.json
-cd <parent>/memory_system && git init -q
+mkdir -p "<parent>"
+python3 init-vault.py "<parent>/answers.json"
+cd "<parent>/memory_system" && git init -q && git rev-parse --git-dir
 ```
 
+The last command must print `.git`. Anything else means git found another repo (the
+engine's, or a parent folder's): stop, show it, and do not commit anything.
+
 If `init-vault.py` stops with "is not empty", ask for another folder (fact) and go
-back to Step 2. If it fails any other way, show the error and stop.
+back to Step 2. If it fails any other way, show the error and ask "Delete the two
+half-built vault folders so you can run it again?" (yes/no). Delete them only on a
+yes, and only those two folders.
 
 ## Step 4 — Fill in what the answers file does not carry
 
@@ -140,7 +153,8 @@ All edits are in the new vaults. Each is a small, targeted edit.
   the vault's lint.config.org.json (in .scripts) so lint stops listing it. That array replaces the
   engine's, so copy the engine's list with it:
   `"notFilled": { "skip": ["templates/**", "_private/2_AREAS/<ORG>/My Team/Direct Reports.md"] }`.
-- **Watch list.** In ME.md, one `| Name | why |` row per person under `## Watch list`.
+- **Watch list.** In ME.md, under `## Watch list`, replace the empty `| | |` row
+  with one `| Name | why |` row per person.
 - **Slack channels.** If channels were picked, replace the example line in
   the channel list file, `<ORG> Slack Channels` under 3_RESOURCES/<ORG>, with one line per channel:
   `- [#name](https://<workspace>.slack.com/archives/<channel ID>)`.
@@ -148,7 +162,7 @@ All edits are in the new vaults. Each is a small, targeted edit.
 ## Step 5 — Lint, then hand over
 
 ```bash
-cd <parent>/memory_system && node .scripts/lint.mjs
+cd "<parent>/memory_system" && node .scripts/lint.mjs
 ```
 
 - The summary line must show **0 must-fix**. If not, show the must-fix findings and
