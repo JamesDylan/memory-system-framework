@@ -127,7 +127,7 @@ meeting-ingest runs each case against a frozen copy of the vault (git commit `21
 
 - **A new scenario:** copy a file in <seat>/evals/cases/, change the input (Slack messages, or the `.txt` Gemini notes beside a meeting-ingest case) and the `expect` block. Add a case each time the agent gets something wrong in real life. Keep the real failure's wording.
 - **A new lock:** add a row to <seat>/evals/locks.json (tool, input, expect `allow` or `block`).
-- **A new seat:** copy `templates/seat/` to 2_AREAS/Agents/<name>/ (set its model in `seat.conf`), then follow `templates/seat-brief.md`. A new seat needs its own <name>/evals/locks.json and cases/, and `SERVERS=` and `RUNNER=` in its `seat.conf`, before `.scripts/run_evals.py --seat <name>` means anything. No engine file changes. The eval tests the model in the seat's `seat.conf` unless `--model` is given.
+- **A new seat:** run `python3 .scripts/new-seat.py <name> --runner slack|notes` from the vault root. It makes 2_AREAS/Agents/<name>/ from `templates/seat/` with `SERVERS=`, `RUNNER=`, the standard locks and an empty cases/, and checks the locks. Then set its model in `seat.conf` and follow `templates/seat-brief.md`. No engine file changes. The eval tests the model in the seat's `seat.conf` unless `--model` is given.
 
 ### What the check does not cover
 

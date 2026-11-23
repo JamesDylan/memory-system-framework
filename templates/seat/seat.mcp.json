@@ -1,5 +1,5 @@
 {
   "mcpServers": {
-    "qmd": { "command": "qmd", "args": ["mcp"] }
+    "qmd": { "command": "qmd", "args": ["--index", "seats", "mcp"] }
   }
 }
