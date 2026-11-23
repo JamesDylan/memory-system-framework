@@ -46,5 +46,5 @@ The short operating rules below are enough to work. The full rules, and why, are
 - **Not {{ORG}}:** `_private/1_PROJECTS/Working-prototypes/`, `_private/3_RESOURCES/AI Tooling/`, and the personal areas under `_private/2_AREAS/`.
 - **Trust the stamps.** If `Last verified accurate` is old or "not yet", say the answer may be stale.
 - **A failed read is not evidence.** If a connector, qmd or a file read fails, say what failed: missing, no permission, or timed out. Then stop that step. Never guess what the source says.
-- **Don't write unless asked.** New material goes to `_private/0_INBOX/` and is processed via `3_RESOURCES/AI Skills/ingest/SKILL.md`. Never duplicate a fact; edit its canonical file. Structural changes get a `CHANGELOG.md` entry in the same pass.
+- **Don't write unless asked.** New material goes to `_private/0_INBOX/` and is processed via `3_RESOURCES/AI Skills/ingest/SKILL.md`. Never duplicate a fact; edit its canonical file. Structural changes (a file added, moved, renamed or retired) update `memory_index.md` and `CHANGELOG.md` in the same pass.
 - **Skills** in `3_RESOURCES/AI Skills/*/SKILL.md` are instructions for running this vault (start with `second-brain`). Read one before acting as it.

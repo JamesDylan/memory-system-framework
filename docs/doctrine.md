@@ -12,7 +12,7 @@ Paths are relative to the shared vault.
 Every fact has exactly one canonical file, listed in the source-of-truth table in `memory_index.md`. If the same fact lives in two files, the non-canonical one is wrong. Other files point at the home; they never copy it. When a fact changes, edit its home, not wherever it happens to be mentioned.
 
 ### Capture is separate from promotion
-Raw material lands in `_private/0_INBOX/` first, in any shape. The shared vault has no inbox. Raw material becomes structured knowledge only through a deliberate step (the `ingest` skill) that extracts the fact and merges it into its home. The raw source is then archived under `4_ARCHIVE/sources/`, never deleted, so every fact can be traced to its evidence.
+Raw material lands in `_private/0_INBOX/` first, in any shape. The shared vault has no inbox. Raw material becomes structured knowledge only through a deliberate step (the `ingest` skill) that extracts the fact and merges it into its home. The raw source is then archived by type under `4_ARCHIVE/sources/` (Slack pulls and other unsorted sources in the private vault's `_private/4_ARCHIVE/sources/`), never deleted, so every fact can be traced to its evidence.
 
 ### One rhythm per file
 Do not mix content that changes rarely with content that changes weekly. They go stale at different speeds. This is why each project has three files:

@@ -2,7 +2,7 @@
 
 How to build your vaults from this engine, turn on search, and upgrade the engine later. Commands run from the engine checkout unless a step says "in the vault".
 
-Needs Python 3 and Node. Search needs qmd (`npm install -g @tobilu/qmd`).
+Needs Python 3, Node and git. Search is optional and needs qmd (`npm install -g @tobilu/qmd`).
 
 ## Guided: say "set me up"
 
@@ -24,10 +24,10 @@ The answers file holds:
 | `SHARED_VAULT_PATH`, `PRIVATE_VAULT_PATH` | Two new or empty folders | Yes |
 | `PRODUCT_LONG`, `PARTNER`, `ROLE`, `MANAGER` | Full product name, a partner company, your role and manager | No |
 | `OWNER_SLACK_ID`, `SLACK_WORKSPACE` | Your Slack user ID and workspace (the part before `.slack.com`) | No |
-| `USER_ID` | Your login name, used in launchd labels. Defaults to the current user | No |
+| `USER_ID` | Your login name. Defaults to the current user. Only some example seat briefs use it | No |
 | `PILOT_INITIATIVE`, `PILOT`, `SECOND_PILOT` | Your main initiative. Defaults to an example folder you can rename | No |
 
-A key you leave out is written as `(set KEY)`, and lint lists it under "Not filled in yet".
+A key you leave out is written as `(set KEY)`, and lint lists it under "Not filled in yet". Three have defaults instead: `OWNER` (first word of your name), `USER_ID` (your login) and `PILOT_INITIATIVE` ("Example Initiative").
 
 `init-vault.py` replaces every `{{PLACEHOLDER}}` (engine files get organisation values only), builds both vaults, creates the `_private` symlink and its `.gitignore` entry, and writes engine.lock at the shared vault root. It refuses a folder that already has content. Then, in the vault:
 
@@ -70,7 +70,7 @@ Per-person values (your chat user ID, direct reports, watch list) live in the pr
 
 ## Search (qmd)
 
-In the vault:
+In the vault (the script needs zsh, the macOS default shell):
 
 ```bash
 .scripts/qmd-bootstrap.sh

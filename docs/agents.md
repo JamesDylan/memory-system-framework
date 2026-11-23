@@ -179,6 +179,6 @@ The report is `<seat>/evals/results/latest.md`. It opens with "All clear" or "Ne
 
 ## Limits
 
-- macOS only, and one machine per person: seats run while that Mac is on. Where seats run for a whole team is still open.
+- launchd seats need macOS and run only while that Mac is on. Only a seat with no model and no local files (`health-digest`) can run on GitHub Actions today. Where model-run seats run for a whole team is still open.
 - `dispatcher` and `team-sync` share `meeting-ingest`'s env file (same bot, channel and owner).
 - The evals do not touch real Slack, so they cannot find a missing bot scope or channel invite. The hand run in step 6 does.

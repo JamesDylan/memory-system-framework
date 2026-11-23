@@ -32,6 +32,13 @@ After step 1, ask your agent **"what's in my active cycle?"** You should get a r
 - **The example initiative.** `init-vault.py` creates one example initiative folder so the skills have something to point at. Once your real initiatives exist, the agent can help you swap it out.
 - **See what is still empty.** Run `node .scripts/lint.mjs`. Its to-do list names every file that still ends `> Not filled in yet.`
 
+## After the first week
+
+- **Every day, capture and file.** Paste or drop new material and say "ingest this" or "process my inbox", or ask your agent to "run my daily Slack review" first. Seats can capture meetings and Slack on a clock instead ([agents.md](agents.md)).
+- **When you need an answer,** ask your agent in any tool. It searches first, reads the one file that holds the fact, cites it, and tells you if the answer may be out of date.
+- **Every week,** run `node .scripts/lint.mjs` (or read the CI report) and fix what it flags.
+- **Add agents one job at a time.** Pick the manual job that costs you most and [build a seat](build-a-seat.md) for it.
+
 ## Learning mode
 
 A new vault starts with learning mode on (`Learning mode | on` in the private ME.md). Your agent ends each task with a two-line "What just happened:" note: which files it read or changed, and why. The `Level` in ME.md sets how much it explains:

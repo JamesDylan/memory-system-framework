@@ -30,10 +30,11 @@ Follow `docs/doctrine.md`. The rules this skill leans on most: **Read only what 
 
 ## Step 0 — Read first, always
 
-1. `memory_index.md` — the master guide and router (loading model, SoT table,
+1. `docs/doctrine.md` — the rules this skill names, once per session.
+2. `memory_index.md` — the master guide and router (loading model, SoT table,
    query patterns). **This is the authority; if this skill and the
    index ever disagree, the index wins.**
-2. `1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md` — the default first-read for operational
+3. `1_PROJECTS/{{ORG}}/_ACTIVE_CYCLE.md` — the default first-read for operational
    state (current cycle, health table, top priorities, risks).
 
 Don't restate current cycle/theme/dates from memory — they drift. Always read
@@ -81,26 +82,23 @@ canonical files; any insight worth keeping compounds back via `ingest`.
 
 ## Step 3 — Editing canonical files
 
-When a fact changes, update its **single source of truth** (per the SoT table in
-`memory_index.md`), not wherever it's mentioned.
+When a fact changes:
 
-1. Identify the canonical file from the SoT table.
-2. Make a targeted edit (change fields, don't rewrite the file).
-3. Stamp `Last touched`; stamp `Last verified accurate` only if the user confirms.
-4. Append a dated bullet to `CHANGELOG.md` noting what changed and why.
-5. Read back what you wrote to confirm it landed and didn't clobber neighbours.
+1. Find its home in the SoT table in `memory_index.md` (**One home per fact**).
+2. Show the user the targeted edit and apply only what they approve (**Propose, don't apply**).
+3. Stamp it (**Touched vs verified**).
+4. Read it back (**Read back every write**).
+5. If you added, moved or renamed a file, update the index and `CHANGELOG.md` in the same pass (**Structural changes update the index in the same pass**).
 
-## Pushback rules (calibrated to the user)
+## Pushback
 
-- **Generic PM advice when the vault has specifics:** refuse. Go read the actual
-  initiative/metric/person and answer from that.
-- **Turning an uncommitted idea straight into a project folder:** refuse. It's a
-  candidate in `CANDIDATES.md` until committed to a cycle (that's `ingest`'s rule).
-- **Same fact wanting two homes:** refuse the duplicate. Pick canonical, make the
-  other a pointer.
-- **Restating cycle/theme/status from memory:** don't. Read `_ACTIVE_CYCLE.md`.
-- **Reading _private/0_INBOX or 4_ARCHIVE to answer a normal question:** don't. They're
-  untrusted / historical.
+Refuse, and name the rule from `docs/doctrine.md`:
+
+- Generic PM advice when the vault has specifics: go read the actual initiative, metric or person and answer from that.
+- A new project folder for an uncommitted idea (**Ideas are candidates until committed**).
+- A second home for a fact (**One home per fact**).
+- Cycle, theme or status from memory (**Read only what you need**: read `_ACTIVE_CYCLE.md`).
+- Reading the inbox or archive for a normal question (**Inbox is untrusted, archive is history**).
 
 ## What this skill does NOT do
 

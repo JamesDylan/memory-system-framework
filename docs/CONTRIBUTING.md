@@ -14,9 +14,9 @@ How to change the engine, and how a change made in a vault gets back here. The r
 | Lint, judgment | `3_RESOURCES/AI Skills/lint/` | Conflicts and semantic staleness. Needs an agent |
 | Search | `.scripts/qmd-bootstrap.sh`, `templates/qmd-index.template.yml` | Local hybrid search with qmd, one collection per vault |
 | Metrics | `_metrics/` | A registry of typed metric values with a checker. One place a number may change |
-| Skills | `3_RESOURCES/AI Skills/` (capture: `daily-slack-review`; route: `ingest`, `diff-propose`; think: `second-brain`, `challenge`, `emerge`, `connect`, `review-prep`; run: `setup`, `lint`, `memory-system-upgrade`), and `private/` (`watch`, `calibrate`, `debloat`, installed into the private vault) | What agents do in a vault |
+| Skills | `3_RESOURCES/AI Skills/` (capture: `daily-slack-review`; route: `ingest`, `diff-propose`; think: `second-brain`, `challenge`, `emerge`, `connect`, `review-prep`; run: `setup`, `lint`, `memory-system-upgrade`), and `private/` (`watch`, `calibrate`, `debloat`, installed into the private vault and not in engine.lock yet, so upgraded by hand) | What agents do in a vault |
 | Seats | `examples/seats/`, `templates/seat/`, `templates/seat-brief.md`, `templates/laws-audit.md`, `.scripts/new-seat.py`, `.scripts/run_evals.py` | Example scheduled agents, the seat template and the eval runner |
-| Install and upgrade | `init-vault.py`, `engine-files.json`, `.scripts/engine-upgrade.py` | Build vaults, record the lock, upgrade |
+| Install and upgrade | `engine-files.json`, `.scripts/engine-upgrade.py`; `init-vault.py` stays in the engine checkout and is not copied into a vault | Build vaults, record the lock, upgrade |
 | Publish | `.scripts/export-framework.py` | Export the engine from a vault with no organisation data |
 | Docs | `README.md`, `AGENTS.md`, `docs/` | This file among them. The engine changelog is `docs/CHANGELOG.md`, because a vault's root CHANGELOG.md is its own |
 
@@ -31,15 +31,21 @@ If lint check `engine-drift` reports an engine file you changed in a vault, the 
 
 ## Upstream a change from a vault
 
-1. Make the change in a checkout of this repo, on a branch, not only in your vault. Engine files hold organisation placeholders (`{{ORG}}`, `{{PRODUCT}}` and the other organisation keys in `init-vault.py`), never your organisation's values and never a person placeholder such as an owner's name: `init-vault.py --selftest` fails on those.
+1. Make the change in a checkout of this repo, on a branch, not only in your vault. Engine files hold organisation placeholders (the keys in `ORG_KEYS` in `init-vault.py`, each written in double braces), never your organisation's values. They should not hold person placeholders (an owner's name or user ID): those are never filled in engine files. Some examples and scripts still do (known debt); don't add more.
 2. Run the organisation-terms check (below) and the self-tests.
-3. Open a pull request on this repo. CI must pass.
-4. After merge, the maintainer adds an entry to `docs/CHANGELOG.md` and tags a release.
+3. Add a line for your change under **Unreleased** in `docs/CHANGELOG.md`, then open a pull request on this repo. CI must pass.
+4. After merge, the maintainer tags a release.
 5. In the vault: `python3 .scripts/engine-upgrade.py <tag>` ([setup.md](setup.md#upgrade-the-engine)). Your local edit now matches upstream, so the drift report clears.
 
 ## The organisation-terms check
 
 Before any push to this repo, scan every changed file for your organisation's own terms: company, product, partner, customer, people and system names. Match on word boundaries, so a short term does not hit inside another word. Any hit blocks the push: replace it with a placeholder or plain words.
+
+For example, with your organisation's term file (one term per line) kept outside this repo:
+
+```bash
+git diff --name-only origin/main | xargs grep -n -i -w -F -f ~/path/to/org-terms.txt   # any output blocks the push
+```
 
 Your organisation keeps its term list outside this repo. Never commit the list here, not even in a test: the list itself names the organisation.
 

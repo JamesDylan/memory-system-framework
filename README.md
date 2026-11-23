@@ -43,7 +43,7 @@ It works in Obsidian, any editor and any agent that can read files. Every change
 
 ## Quickstart (5 minutes)
 
-Needs Python 3, Node and git.
+Needs Python 3, Node and git. Search (qmd) is optional: [docs/setup.md](docs/setup.md#search-qmd).
 
 1. Clone this repo.
 2. Open the folder in Claude Code, or any agent that can read files and run commands.
@@ -68,7 +68,7 @@ Needs Python 3, Node and git.
 ## Limits
 
 - Built and used by one person so far. A shared team vault is set up; use by a second PM is the next test.
-- Seats run on one person's Mac today (launchd), and each needs its own secrets and Slack app. Where seats run for a team is still open.
+- Most seats run on one person's Mac (launchd); `health-digest` can run on GitHub Actions. Each needs its own secrets and Slack app. Where seats run for a team is still open.
 - Project harnesses and pipelines are partly built or planned ([roadmap](docs/roadmap.md)).
 - Skill text keeps its design history. Names of people, projects and systems were replaced with placeholders, so some examples read as generic.
 - The scheduled lint job is macOS only. Skills assume an agent with file access and, for capture, a chat connector.

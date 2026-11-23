@@ -34,7 +34,7 @@ Follow `docs/doctrine.md`. This skill is where these rules bite: **Capture is se
 
 ## Step 0 — Read first
 
-1. This skill (the routing map below).
+1. This skill (the routing map below), and `docs/doctrine.md` for the rules it names.
 2. `memory_index.md` — the single-source-of-truth table IS the master router.
 3. If the input concerns an existing initiative, that initiative's `STATE.md`
    and `LOG.md` before proposing changes.

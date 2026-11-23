@@ -4,11 +4,9 @@
 
 Drop raw material here without thinking about where it belongs: meeting notes, Slack exports, voice-memo transcripts, a half-formed feature idea, feedback on an existing initiative, a doc someone sent you, a screenshot of a chart.
 
-## The promotion rule (doctrine: Capture is separate from promotion)
+## The promotion rule
 
-1. **Capture is free.** Drop anything here, any format, any time. Never agonise over filing.
-2. **Promotion is deliberate.** Raw material only graduates to `1_PROJECTS`, `2_AREAS`, or a candidate entry **after processing** — meaning the useful insight is extracted and merged into the correct canonical file. Then the raw inbox file is moved to its type folder under `4_ARCHIVE/sources/` (slack, meetings, docs, decks, data, notes, other) and kept. Raw sources are never deleted (changed 2026-10-29), so every canonical fact can be traced back to its evidence.
-3. **Default reads ignore this folder.** Claude never reads `_private/0_INBOX/` on a normal query. It is raw, unprocessed, and untrusted until promoted. This is what stops a raw dump (e.g. the old Growth Loops export) from contaminating canonical context.
+Capture here is free; filing is deliberate, through `ingest`, and the raw file is then archived, never deleted. The rule in full: "Capture is separate from promotion" in `docs/doctrine.md` in the shared vault.
 
 ## Paste into chat first
 
