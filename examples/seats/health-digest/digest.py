@@ -4,22 +4,26 @@
   ./digest.py --dry-run   print the message, post nothing
   ./digest.py --selftest  no network
 Env: VAULT (vault root; run.sh sets it), SLACK_BOT_TOKEN, SEAT_OUT_CHANNEL."""
-import json, os, subprocess, sys, tempfile, urllib.request
+import json, os, subprocess, sys, tempfile, urllib.error, urllib.request
 
 TOP = 3
+esc = lambda t: str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")  # Slack's three control characters
 
 
 def message(health, lint):
     """Health line, the lint counts, then the TOP findings: every must-fix before any should-fix."""
     f = lint["findings"]
     ranked = [("🔴", x) for x in f["red"]] + [("🟡", x) for x in f["amber"]]
-    lines = [health.strip(), f"*Lint:* {len(f['red'])} must-fix · {len(f['amber'])} should-fix" + ("" if ranked else " · nothing to fix")]
-    lines += [f"{i}. {icon} {x['msg']}" + (f" _Fix: {x['fix']}_" if x.get("fix") else "") for i, (icon, x) in enumerate(ranked[:TOP], 1)]
+    lines = [esc(health.strip()), f"*Lint:* {len(f['red'])} must-fix · {len(f['amber'])} should-fix" + ("" if ranked else " · nothing to fix")]
+    lines += [f"{i}. {icon} {esc(x['msg'])}" + (f" _Fix: {esc(x['fix'])}_" if x.get("fix") else "") for i, (icon, x) in enumerate(ranked[:TOP], 1)]
     return "\n".join(lines)
 
 
 def node(vault, *args):
-    r = subprocess.run(["node", *args], cwd=vault, capture_output=True, text=True)
+    try:
+        r = subprocess.run(["node", *args], cwd=vault, capture_output=True, text=True)
+    except OSError as e:  # no node on PATH, or the vault folder is missing
+        raise RuntimeError(f"{args[0]}: {e}") from e
     if r.returncode:
         err = r.stderr.splitlines()
         why = next((l for l in err if "Error" in l or l.startswith("lint:")), err[-1] if err else f"exit {r.returncode}")
@@ -43,7 +47,10 @@ def post(text):
     body = json.dumps({"channel": channel, "text": text, "unfurl_links": False, "unfurl_media": False}).encode()
     req = urllib.request.Request("https://slack.com/api/chat.postMessage", body, {
         "Authorization": "Bearer " + token, "Content-Type": "application/json; charset=utf-8"})
-    r = json.load(urllib.request.urlopen(req, timeout=15))
+    try:
+        r = json.load(urllib.request.urlopen(req, timeout=15))
+    except (urllib.error.URLError, ValueError) as e:  # HTTPError is a URLError
+        sys.exit(f"health-digest: could not reach Slack: {e}")
     if not r.get("ok"):
         sys.exit("health-digest: Slack said " + r.get("error", "not ok"))
 
@@ -63,7 +70,18 @@ def selftest():
     ok(message(health, lint).split("\n")[2].startswith("1. 🟡 `c.md`"), "should-fix when no must-fix")
     lint["findings"]["amber"] = []
     ok(message(health, lint).split("\n")[1:] == ["*Lint:* 0 must-fix · 0 should-fix · nothing to fix"], "clean vault")
+    try:
+        node("/nonexistent-health-digest-vault", ".scripts/lint.mjs")
+        ok(False, "a missing vault must raise")
+    except RuntimeError as e:
+        ok(failed(e).startswith("*Vault health:* not computed (.scripts/lint.mjs: "), failed(e))
+    lint["findings"]["red"] = [{"msg": "`a & b` <x>"}]
+    ok(message(health, lint).split("\n")[2] == "1. 🔴 `a &amp; b` &lt;x&gt;", "escapes & < >")
     print("selftest ok")
+
+
+def failed(e):
+    return f"*Vault health:* not computed ({esc(e)}). Run `node .scripts/lint.mjs` in the vault."
 
 
 if __name__ == "__main__":
@@ -76,6 +94,6 @@ if __name__ == "__main__":
     try:
         text = build(vault)
     except (RuntimeError, ValueError) as e:  # still post, so a broken lint is seen rather than silent
-        text = f"*Vault health:* not computed ({e}). Run `node .scripts/lint.mjs` in the vault."
+        text = failed(e)
     print(text) if arg == "--dry-run" else post(text)
     sys.exit(text.startswith("*Vault health:* not computed"))

@@ -37,7 +37,7 @@ Everything outside the vault is per person and per machine. This guide is how yo
 | `kr-feed` | Proposes key-result changes from Productboard. No model | Productboard API (read-only) | `kr-feed.env` | Weekly |
 | `health-digest` | Posts the vault health line and the top 3 lint findings. No model, needs only a Slack bot token | The vault (lint and `health.mjs`) | `health-digest.env`, or Actions secrets | Weekly (launchd or GitHub Actions) |
 
-Start with one seat. `meeting-ingest` gives the most value; `kr-feed` is the cheapest (no model at all).
+Start with one seat. `health-digest` is the cheapest first seat: no model and no Claude Code, only a Slack bot token. `meeting-ingest` gives the most value.
 
 ## Set up a seat
 

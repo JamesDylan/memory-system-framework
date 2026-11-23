@@ -423,12 +423,12 @@ async function checkStaleness() {
   for (const p of contracts.keys()) if (!targets.has(p)) add("red", "contract", `Refresh contract names \`${p}\`, which is not an operational file`, "Add it to operationalFiles with a rhythm, or fix the path");
   const fmt = (x) => `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
 
-  let clean = 0, paused = 0;
+  let clean = 0, paused = 0, stubs = 0;
   for (const [path, rhythm] of targets) {
     if (SHARED && path.startsWith(PRIV(cfg) + "/")) continue;
     const text = await readSafe(join(ROOT, path));
     if (text === null) { add("red", "dead-pointer", `Operational file \`${path}\` (staleness policy) is missing`, "Fix path in the lint config or restore file"); continue; }
-    if (isStub(text) && !stampsOf(text).verified) continue; // a never-verified stub has nothing to be stale; Check 13 lists it. Once verified, a forgotten marker no longer hides staleness.
+    if (isStub(text) && !stampsOf(text).verified) { stubs++; continue; } // a never-verified stub has nothing to be stale; Check 13 lists it. Once verified, a forgotten marker no longer hides staleness.
     if (isPaused(text)) { paused++; continue; }
     const threshold = cfg.stalenessThresholdsDays[rhythm];
     // The registry has no prose stamps: its newest per-metric as_of is both its edit and its confirmation date.
@@ -485,6 +485,7 @@ async function checkStaleness() {
   }
   if (clean) add("green", "staleness", `${clean} operational file(s) within their freshness and verification windows`);
   if (paused) add("green", "staleness", `${paused} paused initiative STATE file(s) skipped (frontmatter health: paused)`);
+  if (stubs) add("green", "staleness", `${stubs} operational file(s) not filled in yet, skipped`); // health.mjs reads this to tell a new vault from a format change
 }
 
 // ── Check 3: orphan skills (on disk but not in the index) ────────────────────
