@@ -10,6 +10,7 @@ case "$MODEL" in claude-*|haiku|sonnet|opus) ;; *) echo "bad MODEL: $MODEL" >&2;
 set -a; . "$HOME/.config/$SEAT.env" || exit 1; set +a   # needs SLACK_BOT_TOKEN, SEAT_OUT_CHANNEL
 mkdir -p .out; rm -f .out/note.txt
 ./gate.sh || exit 0   # no new work or gate error: no model run
+../seat-qmd.sh || exit 1   # qmd search: shared vault only, never private notes
 claude -p "Do one round as set out in AGENTS.md, then stop." \
   --model "$MODEL" \
   --permission-mode dontAsk \

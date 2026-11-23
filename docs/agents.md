@@ -153,11 +153,11 @@ The report is `<seat>/evals/results/latest.md`. It opens with "All clear" or "Ne
 ## Build a new seat
 
 1. Pick the manual job that costs you most. It needs a gate a script can check, one place to write, and an output a person can approve.
-2. Copy `templates/seat/` (or the closest example in `examples/seats/`) to `2_AREAS/Agents/<name>/` and follow `templates/seat-brief.md`: fill the placeholders, write the brief, the gate and the hook.
+2. Run `python3 .scripts/new-seat.py <name> --runner slack|notes`. It copies `templates/seat/` to `2_AREAS/Agents/<name>/`, fills the placeholders, sets `SERVERS=` and `RUNNER=`, writes the standard locks and proves they hold. (Or copy the closest example in `examples/seats/`.) Then follow `templates/seat-brief.md`: write the brief, the gate and the hook.
 3. Choose the cheapest model that passes (`seat.conf`), and set the turn limit and cost cap.
-4. Add `<name>/evals/locks.json` and `<name>/evals/cases/`, and set `SERVERS=` and `RUNNER=` in its `seat.conf`. No engine file changes.
+4. Add a lock to `<name>/evals/locks.json` for each drawer file and each new refusal, and cases to `<name>/evals/cases/`. No engine file changes.
 5. Pass the evals, do one hand run, pass the [safety audit](../templates/laws-audit.md), then put it on a clock (step 7 above).
-6. Add a row to `2_AREAS/Agents/README.md`.
+6. Fill in its row in `2_AREAS/Agents/README.md` (new-seat adds a stub row).
 
 ## Limits
 

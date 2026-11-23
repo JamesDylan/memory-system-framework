@@ -2,15 +2,11 @@
 
 Adapted from `starter/seat-brief.md` in https://github.com/mariuscwium/pac26. Four parts: brief, drawer, clock, mail. Plain text. Works in any tool that takes instructions and can run on a schedule.
 
-**Start a seat:** copy `templates/seat/` to `Agents/<seat-name>/`. It has the same layout as `examples/seats/experiment-reporter/`: `AGENTS.md` (this brief), `run.sh`, `gate.sh`, `seat.conf`, `seat.mcp.json`, `.claude/settings.json` and `.claude/hooks/guard.py`. Fill the placeholders in one pass:
-
-```bash
-cd "Agents/<seat-name>" && grep -rl "__" . | xargs sed -i '' -e "s#__SEAT__#<seat-name>#g" -e "s#__SEATDIR__#$(pwd -P)#g" -e "s#__VAULT__#$(git rev-parse --show-toplevel)#g"
-```
+**Start a seat:** from the vault root, run `python3 .scripts/new-seat.py <seat-name> --runner slack|notes`. It copies `templates/seat/` to `2_AREAS/Agents/<seat-name>/` (the same layout as `examples/seats/experiment-reporter/`: `AGENTS.md` (this brief), `run.sh`, `gate.sh`, `seat.conf`, `seat.mcp.json`, `.claude/settings.json` and `.claude/hooks/guard.py`), fills its placeholders, writes `evals/`, and runs the guard selftest and the `--locks-only` eval.
 
 Then fill the brackets in `AGENTS.md`, write `gate.sh` (check and `--mark`), and list the drawer files in `guard.py` (`EDIT`) and `settings.json` (`Edit(...)`). Run `/usr/bin/python3 .claude/hooks/guard.py --selftest`. Secrets go in `~/.config/<seat-name>.env` (`SLACK_BOT_TOKEN`, `SEAT_OUT_CHANNEL`, `CLAUDE_CODE_OAUTH_TOKEN`), never in the repo.
 
-**Choose the model in `seat.conf`** (`MODEL=`). Pick by the hardest step the seat must do: Haiku for mechanical work, Sonnet (default) for reading and comparing sources, Opus for hard judgment where a wrong answer is costly. `.scripts/run_evals.py --seat <name>` tests the model in `seat.conf` unless you pass `--model`. A new seat needs its own `evals/locks.json` and `evals/cases/`, and `SERVERS=` and `RUNNER=` in `seat.conf`, before the eval means anything for it. To try another model once: `SEAT_MODEL=<model> ./run.sh`. The same file sets the turn and cost ceilings (law 5) and the tool list (law 2). Record the model and the worst-case weekly cost in the checklist below.
+**Choose the model in `seat.conf`** (`MODEL=`). Pick by the hardest step the seat must do: Haiku for mechanical work, Sonnet (default) for reading and comparing sources, Opus for hard judgment where a wrong answer is costly. `.scripts/run_evals.py --seat <name>` tests the model in `seat.conf` unless you pass `--model`. `new-seat.py` writes the standard `evals/locks.json`, an empty `evals/cases/`, and `SERVERS=` and `RUNNER=` in `seat.conf`; add cases before the behaviour eval means anything. To try another model once: `SEAT_MODEL=<model> ./run.sh`. The same file sets the turn and cost ceilings (law 5) and the tool list (law 2). Record the model and the worst-case weekly cost in the checklist below.
 
 ```markdown
 # [Seat name]

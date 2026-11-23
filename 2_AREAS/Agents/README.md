@@ -11,7 +11,7 @@ Update this file when a seat is added, rescheduled or stopped.
 
 ## Add a seat
 
-Start from an example in `examples/seats/` (or from `templates/seat/` for a new job). From the vault root:
+For a new job, run `python3 .scripts/new-seat.py <name> --runner slack|notes` from the vault root: it builds the seat from `templates/seat/`, checks its locks and adds its row below. To start from an example in `examples/seats/` instead:
 
 ```bash
 cp -R examples/seats/<seat> 2_AREAS/Agents/
