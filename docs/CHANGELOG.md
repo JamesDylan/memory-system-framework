@@ -2,7 +2,7 @@
 
 Changes to the engine, by tag. A vault's own changes go in its root CHANGELOG.md; this file is the engine's, and `engine-upgrade.py` brings it along.
 
-## Unreleased
+## v0.2.0 — 2026-11-23
 
 Onboarding for people who fork the engine.
 
