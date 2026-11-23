@@ -15,7 +15,8 @@ already has content.
 import datetime, fnmatch, getpass, hashlib, json, os, re, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SKIP = {".git", ".claude", "node_modules", "__pycache__"}  # .git is a file in a worktree or submodule checkout
+SKIP = {".git", "node_modules", "__pycache__"}  # .git is a file in a worktree or submodule checkout
+TOP_SKIP = {".claude"}  # the checkout's own agent settings and worktrees; seats keep their .claude/
 TEXT_EXT = (".md", ".json", ".yml", ".yaml", ".py", ".mjs", ".sh", ".plist", ".base", ".txt", ".canvas", ".js", ".toml", ".conf")
 # template -> destination, relative to the shared vault ("P:" = private vault)
 PLACE = [
@@ -127,7 +128,7 @@ def main():
 
     # 1. copy the engine into the shared vault, filling names and contents
     for root, dirs, files in os.walk(HERE):
-        dirs[:] = [d for d in dirs if d not in SKIP]
+        dirs[:] = [d for d in dirs if d not in SKIP and not (root == HERE and d in TOP_SKIP)]
         for f in files:
             if f in SKIP:
                 continue
@@ -227,7 +228,7 @@ def selftest():
     import subprocess, tempfile
     with tempfile.TemporaryDirectory() as t:
         src = os.path.join(t, "engine")  # a worktree-style checkout: .git is a file, and .claude/ holds local settings
-        shutil.copytree(HERE, src, ignore=shutil.ignore_patterns(*SKIP))
+        shutil.copytree(HERE, src, ignore=lambda d, names: [n for n in names if n in SKIP or (d == HERE and n in TOP_SKIP)])
         open(os.path.join(src, ".git"), "w").write("gitdir: /nowhere\n")
         os.makedirs(os.path.join(src, ".claude"))
         open(os.path.join(src, ".claude", "settings.local.json"), "w").write("{}\n")
@@ -238,6 +239,7 @@ def selftest():
         subprocess.run([sys.executable, os.path.join(src, "init-vault.py"), os.path.join(t, "answers.json")], check=True, stdout=subprocess.DEVNULL)
         shared = os.path.join(t, "shared")
         assert not os.path.lexists(os.path.join(shared, ".git")) and not os.path.lexists(os.path.join(shared, ".claude")), "the checkout's .git and .claude stay out of the vault"
+        assert os.path.isfile(os.path.join(shared, "templates/seat/.claude/hooks/guard.py")), "seat .claude folders still ship"
         home = os.path.join(t, "home")  # empty HOME, as in CI: no installed skills to compare with
         os.makedirs(home)
         out = subprocess.run(["node", ".scripts/lint.mjs", "--json"], cwd=shared, capture_output=True, text=True, env={**os.environ, "HOME": home}).stdout
