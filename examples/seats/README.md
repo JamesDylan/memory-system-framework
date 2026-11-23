@@ -14,6 +14,7 @@ Last verified: 2026-11-18.
 | `kr-feed` | Reads the `{{PRODUCT}} 2027` objectives and their key results from Productboard (REST API, read-only). If they differ from the feed block in `cy27_objectives.md`, posts the diff to #second-brain. {{OWNER}} reacts ✅ to apply (one git commit of that file) or ❌ to drop. No answer in 7 days: dropped, proposed again next week. Never edits outside its block or the file's stamps. | **Weekly, Monday 09:00 Auckland** (launchd). **No model**, no cost. | Built 2026-11-20; token set. **Blocked**: CY27 KRs are not KR items in Productboard yet (decision with Product Ops), so not on the clock. Move 11g | {{OWNER_NAME}} (proposed, confirm) |
 
 | `dispatcher` | Runs job files from `jobs/`. A job comes from {{OWNER}}'s reply `[U<n>:] project <Name>` in a meeting-ingest thread (`review.py collect` writes it). Formula `new-project`: creates 1_PROJECTS/{{ORG}}/<Name>/ (BRIEF, STATE, LOG), runs the hub script, replies in the thread with the edits {{OWNER}} still makes by hand (ROADMAP, active cycle, CANDIDATES), commits. | Every 15 min: meeting-ingest `run.sh` calls `dispatcher/run.sh` right after `collect`. No open job: no model run. One job per run. | On the clock since 2026-11-20, after one hand run. Log: `~/.config/dispatcher.log`. Brief: `dispatcher/AGENTS.md` | {{OWNER_NAME}} (proposed, confirm) |
+| `health-digest` | Runs lint (shared checks) and `health.mjs`, then posts the health line and the top 3 findings, must-fix first, to `SEAT_OUT_CHANNEL`. The starter seat: it needs only a Slack bot token. | **Weekly, Monday 09:00 Auckland**: launchd, or GitHub Actions (`health-digest/health-digest.yml`) when the Mac may be off. **No model**, no cost. | Built 2026-11-23, not on a clock yet | The vault owner |
 
 The clock is outside the agent. macOS launchd starts `run.sh`. `run.sh` checks Slack first. No new message means no AI run and no cost. Model, step limit (25) and cost cap ($2 per run) are set in the seat's `seat.conf`.
 
@@ -63,6 +64,18 @@ No model, so no eval check: `./feed.py --selftest` (no network) tests the block 
 | Change which objectives | Edit `ROOT` in `kr-feed/feed.py` (the parent objective's name) |
 
 **Set up (once).** 1. In Productboard, create an API token with read access only, and put it in `~/.config/kr-feed.env` as `PRODUCTBOARD_TOKEN=`, with `SLACK_BOT_TOKEN`, `SEAT_OUT_CHANNEL` and `SEAT_OWNER_ID` copied from `~/.config/meeting-ingest.env`. 2. Run `--dry-run` and check the table. 3. Copy `com.{{USER_ID}}.experiment-reporter.plist` to `com.{{USER_ID}}.kr-feed.plist`: change `Label`, the `run.sh` path and the log paths to kr-feed, and set `StartCalendarInterval` to `Weekday` 1, `Hour` 9. 4. `launchctl bootstrap` it (above).
+
+## Start, stop, check (health-digest)
+
+No model, so no eval check: `health-digest/digest.py --selftest` (no network) tests the message and the top-3 order.
+
+| I want to | Run this |
+|---|---|
+| See the message (posts nothing) | `health-digest/run.sh --dry-run` |
+| Run it now | `health-digest/run.sh`, or "Run workflow" on the health-digest Action |
+| See what it did | `~/.config/health-digest.launchd.log`, or the Action's run log |
+
+**Set up (once).** 1. Make a Slack bot with `chat:write`, invite it to your notes channel. 2. Pick one clock. **Mac:** put `SLACK_BOT_TOKEN=` and `SEAT_OUT_CHANNEL=` in `~/.config/health-digest.env`, make the plist from `templates/seat/launchd.plist` as `docs/agents.md` step 7 says, keep the `StartCalendarInterval` schedule with `Weekday` 1 and `Hour` 9, and make sure its PATH has `node`. **GitHub:** copy `health-digest/health-digest.yml` to `.github/workflows/` in the vault, add the repo secret `SLACK_BOT_TOKEN` and the repo variable `SEAT_OUT_CHANNEL`. Not both, or it posts twice.
 
 ## Start, stop, check (team-sync)
 

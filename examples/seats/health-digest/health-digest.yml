@@ -1,0 +1,25 @@
+# health-digest seat on GitHub's clock, so it runs without a Mac. Copy this file to .github/workflows/health-digest.yml
+# in your vault (after copying the seat to 2_AREAS/Agents/health-digest/). No model, no Claude token.
+# Setup: repo secret SLACK_BOT_TOKEN (bot with chat:write, invited to the channel), repo variable SEAT_OUT_CHANNEL (channel ID).
+# Use this OR the launchd clock, not both, or the digest posts twice.
+name: health-digest
+on:
+  schedule:
+    - cron: "0 20 * * 0" # Monday 09:00 NZDT (cron is UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: bash 2_AREAS/Agents/health-digest/run.sh
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SEAT_OUT_CHANNEL: ${{ vars.SEAT_OUT_CHANNEL }}
