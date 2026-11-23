@@ -1,6 +1,6 @@
 ---
 name: ingest
-version: 2026-11-22.1
+version: 2026-11-23.1
 description: >
   Process raw material from _private/0_INBOX into the user's memory system using the
   Karpathy LLM-wiki pattern: capture messy, promote deliberately, keep one
@@ -90,6 +90,24 @@ committed to a cycle. At that point: create `1_PROJECTS/{{ORG}}/[Name]/` with
 `python3 .scripts/make-initiative-hubs.py` (creates the `[Name]/[Name].md` hub
 that action `category` links resolve to), remove the entry from
 `CANDIDATES.md`, add to `ROADMAP.md` "Now", reflect in `_ACTIVE_CYCLE.md`.
+
+**First run: a vault with no initiatives yet.** If `_ACTIVE_CYCLE.md` still
+ends `> Not filled in yet.` and the only initiative folder is the example one
+init created (the pilot named in `ORG.md`, its files ending in the same
+marker), current-work signal has no home. Don't leave it in the inbox:
+1. Ask whether the pasted material is the current cycle plan. If yes, propose
+   `_ACTIVE_CYCLE.md` content from it (cycle name and dates, one Health row per
+   initiative, priorities, risks) as a Step 3 diff.
+2. Ask which listed initiatives are committed to this cycle. An initiative the
+   user confirms is committed, so promote it as above (files from
+   `templates/BRIEF.template.md`, `templates/STATE.template.md` and
+   `templates/LOG.template.md`), with
+   the user's OK on each folder. Anything not confirmed is a candidate and goes
+   to `CANDIDATES.md`.
+3. Leave the example initiative's folder alone. Once real initiatives exist,
+   ask whether one should replace it as the pilot in `ORG.md`.
+
+The fill order for a new vault is in `docs/first-week.md`.
 
 ## Step 2b — Emit an evidence card (performance-evidence graph)
 

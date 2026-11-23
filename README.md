@@ -173,6 +173,7 @@ What keeps it cheap and accurate along the way:
      4_ARCHIVE/
    ```
 
+   New vault? **[docs/first-week.md](docs/first-week.md)** says what to paste in first and where it lands.
 2. **Every day, capture and file.**
    - *By hand:* drop raw material in `_private/0_INBOX/`, or ask your agent to "run my daily Slack review". Then ask it to "process my inbox". The `ingest` skill files each fact and shows you the changes to approve.
    - *With agents:* seats capture meetings and Slack on a clock and post their proposed changes to Slack. You react ✅ or ❌.
