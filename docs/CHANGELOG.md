@@ -4,7 +4,15 @@ Changes to the engine, by tag. A vault's own changes go in its root CHANGELOG.md
 
 ## Unreleased
 
-- **`setup` skill.** Say "set me up" in the engine checkout: a staged interview (core five facts, then a yes/no per optional part), Slack IDs looked up through a connector, values shown for approval, then `init-vault.py` and lint. `AGENTS.md` "Not set up?" now points at it. ME.md gains `Role` and `Manager` from the answers file (`ROLE`, `MANAGER`); direct reports are optional.
+Onboarding for people who fork the engine.
+
+- **`setup` skill.** Say "set me up" in the engine checkout: a staged interview (core five facts, then a yes/no per optional part, every answer a fact, a yes/no or "later"), Slack IDs looked up through a connector, values shown for approval, then `init-vault.py`, `git init` and lint. `AGENTS.md` "Not set up?" points at it. ME.md gains `Role` and `Manager` (`ROLE`, `MANAGER`); direct reports, action owners and due dates are optional (#17).
+- **First-week guide.** `docs/first-week.md`: paste into chat first, then cycle, initiatives, meeting notes, OKRs/metrics/stakeholders. `ingest` has a first-run path for a vault with no initiatives (#14).
+- **Starter seat `health-digest`.** No model, only a Slack bot token: posts the health line and the top 3 lint findings weekly, by launchd or a GitHub Actions schedule. On a brand-new vault `health.mjs` reports "no sources yet" instead of throwing (#15).
+- **`.scripts/new-seat.py`.** One command builds a seat from `templates/seat/` into `2_AREAS/Agents/<name>/`, writes its evals and checks its locks pass (#16).
+- **Docs rebuilt.** A short README with a quickstart; `docs/setup.md`, `docs/agents.md` (running seats), `docs/build-a-seat.md`, `docs/CONTRIBUTING.md`, `docs/roadmap.md`, and `docs/doctrine.md` as the one home for the rules.
+
+Fixes: `templates/seat/` now uses the shared-only qmd index, so a new seat can't read the private vault through qmd (#16). `init-vault.py` no longer copies a checkout's `.git` file or top-level `.claude/` into the vault (#17).
 
 ## v0.1.0 — 2026-11-23
 

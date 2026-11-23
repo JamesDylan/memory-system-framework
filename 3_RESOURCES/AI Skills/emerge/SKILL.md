@@ -42,7 +42,7 @@ not mutate canonical files. Named patterns compound back via `ingest`.
    beautiful ungrounded one. No pattern-matching for its own sake.
 5. **Answers compound back.** A confirmed pattern gets filed via `ingest` — as a
    learning, a risk, or a candidate — so it stops being re-discovered every
-   month (Doctrine 6).
+   month (doctrine: Answers compound back via ingest).
 
 ## Step 0 — Read first
 

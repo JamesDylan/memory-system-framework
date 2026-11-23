@@ -1,10 +1,26 @@
-# Agents: set up, run, test and build
+# Running seats
 
-This guide covers the scheduled agents ("seats") in `2_AREAS/Agents/`. A new vault has none: the seats below ship as examples in `examples/seats/`, and you copy in the ones you want. A person can follow it, or you can hand it to your own agent:
+This guide covers setting up and running the scheduled agents ("seats") in `2_AREAS/Agents/`: tokens, secrets, clocks, day-to-day running and evals. To make a new one, see [build-a-seat.md](build-a-seat.md). A new vault has no seats: the ones below ship as examples in `examples/seats/`, and you copy in the ones you want. A person can follow this guide, or you can hand it to your own agent:
 
 > Read `docs/agents.md` and set up the `<seat>` seat in this vault. Do one step at a time and show me each command before you run it. Never write a secret into the repo: tell me which file to open and which line to add, and I will paste the value myself.
 
 Paths are relative to the shared vault (the folder `init-vault.py` built), not to this framework folder.
+
+## What a seat is
+
+A seat does one job, nothing more. The pattern comes from the Gas Town method of agentic product ops (notes in `docs/gas-town/`). Every seat has five parts:
+
+| Part | What it means for you |
+|---|---|
+| **Brief** | One job in one sentence, what good looks like, and what it must never do (send, merge, release, delete) |
+| **Gate** | A plain script checks for new work first. No new work: no model run and no cost |
+| **Drawer** | The one folder it may write to. A hook blocks every other write, so a confused agent cannot damage the vault |
+| **Clock** | It wakes on a schedule, does one round, and stops |
+| **Mail** | It ends with a short note in Slack: what changed, what needs you, what it could not do |
+
+Each seat also has its own model (the cheapest one that passes) and the hard limits in [doctrine](doctrine.md), "Hard limits for scheduled agents".
+
+**Replies start work.** Every item a seat posts has an address (`D1` diff, `A1` action, `U1` unrouted). A reply such as `U1: project <Name>` becomes a job file. The `dispatcher` seat runs the job with its own tool list and replies in the thread. A new kind of follow-up is a new formula, not a new agent.
 
 ## What is where
 
@@ -15,12 +31,11 @@ Paths are relative to the shared vault (the folder `init-vault.py` built), not t
 | A seat's evals: locks and behaviour cases | `2_AREAS/Agents/<seat>/evals/` | Yes. `evals/results/` is written locally |
 | The eval runner | `.scripts/run_evals.py` (engine) | Yes |
 | Jobs the dispatcher runs | `2_AREAS/Agents/jobs/` | Yes, one file per job |
-| Template for a new seat | `templates/seat/`, `templates/seat-brief.md` | Yes |
-| Safety audit before a seat goes on a clock | `templates/laws-audit.md` | Yes |
+| How to build a new seat | [build-a-seat.md](build-a-seat.md) | Yes |
 | What runs in this vault | `2_AREAS/Agents/README.md` | Yes |
 | Operating notes for each example seat (start, stop, check) | `examples/seats/README.md` | Yes |
 | **Secrets** (tokens, channel IDs) | `~/.config/<seat>.env` | **No. Never** |
-| **The clock** (macOS launchd job) | `~/Library/LaunchAgents/com.<you>.<seat>.plist`, made from `templates/seat/launchd.plist` | No |
+| **The clock** (macOS launchd job) | `~/Library/LaunchAgents/com.<you>.<seat>.plist` (step 7) | No |
 | Logs | `~/.config/<seat>.log` (last model round), `~/.config/<seat>.launchd.log` (gate and launcher) | No |
 | Run state (what was seen, pending diffs, drafts) | `2_AREAS/Agents/<seat>/.out/` | No (gitignored) |
 
@@ -37,7 +52,7 @@ Everything outside the vault is per person and per machine. This guide is how yo
 | `kr-feed` | Proposes key-result changes from Productboard. No model | Productboard API (read-only) | `kr-feed.env` | Weekly |
 | `health-digest` | Posts the vault health line and the top 3 lint findings. No model, needs only a Slack bot token | The vault (lint and `health.mjs`) | `health-digest.env`, or Actions secrets | Weekly (launchd or GitHub Actions) |
 
-Start with one seat. `health-digest` is the cheapest first seat: no model and no Claude Code, only a Slack bot token. `meeting-ingest` gives the most value.
+Start with one seat: `examples/seats/health-digest/`. It runs no model and needs no Claude Code, only a Slack bot token, and it can run on GitHub Actions instead of your Mac. Its setup is in `examples/seats/README.md`. `meeting-ingest` gives the most value. Which seats are running in the author's vault, and how to start, stop and check each one: `examples/seats/README.md`.
 
 ## Set up a seat
 
@@ -100,18 +115,30 @@ Read the note it posts and the git diff it leaves. Fix the brief or the gate bef
 
 ### 7. Put it on a clock
 
+Do the [safety audit](../templates/laws-audit.md) before any seat goes on a clock.
+
+**launchd (macOS).** A seat made with `new-seat.py` already has a filled `launchd.plist` in its folder: copy it.
+
+```bash
+cp 2_AREAS/Agents/<seat>/launchd.plist ~/Library/LaunchAgents/com.$(whoami).<seat>.plist
+```
+
+An example seat has none. Make it from the template:
+
 ```bash
 SEAT=<seat>; DIR="$(pwd -P)/2_AREAS/Agents/$SEAT"; PL=~/Library/LaunchAgents/com.$(whoami).$SEAT.plist
 sed -e "s#__SEAT__#$SEAT#g" -e "s#__SEATDIR__#$DIR#g" -e "s#__USER__#$(whoami)#g" -e "s#__HOME__#$HOME#g" templates/seat/launchd.plist > "$PL"
 ```
 
-Edit the schedule in that file (every 15 minutes, or a time of day), then load it:
+Keep one of the two schedules in that file (every 15 minutes, or a time of day), then load it:
 
 ```bash
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.$(whoami).<seat>.plist
 ```
 
-`dispatcher` needs no clock: `meeting-ingest/run.sh` calls it. Do the [safety audit](../templates/laws-audit.md) before any seat goes on a clock.
+**GitHub Actions.** A seat that runs no model and needs no local files (`health-digest`) can run in Actions instead, so it works when the Mac is off. Its workflow file and secrets are in `examples/seats/README.md`. Use one clock per seat, not both.
+
+`dispatcher` needs no clock: `meeting-ingest/run.sh` calls it.
 
 ## Run it day to day
 
@@ -148,19 +175,10 @@ The report is `<seat>/evals/results/latest.md`. It opens with "All clear" or "Ne
 
 **Rerun after** a model change, any edit to a seat's `AGENTS.md`, `run.sh`, `settings.json` or `guard.py`, or a bad week.
 
-**Grow it.** Each time a seat gets something wrong in real life, copy a case, change the input to the real failure's wording, and set what it should have done. Add a lock row for each new thing the hook must refuse.
-
-## Build a new seat
-
-1. Pick the manual job that costs you most. It needs a gate a script can check, one place to write, and an output a person can approve.
-2. Run `python3 .scripts/new-seat.py <name> --runner slack|notes`. It copies `templates/seat/` to `2_AREAS/Agents/<name>/`, fills the placeholders, sets `SERVERS=` and `RUNNER=`, writes the standard locks and proves they hold. (Or copy the closest example in `examples/seats/`.) Then follow `templates/seat-brief.md`: write the brief, the gate and the hook.
-3. Choose the cheapest model that passes (`seat.conf`), and set the turn limit and cost cap.
-4. Add a lock to `<name>/evals/locks.json` for each drawer file and each new refusal, and cases to `<name>/evals/cases/`. No engine file changes.
-5. Pass the evals, do one hand run, pass the [safety audit](../templates/laws-audit.md), then put it on a clock (step 7 above).
-6. Fill in its row in `2_AREAS/Agents/README.md` (new-seat adds a stub row).
+**Grow it.** Each time a seat gets something wrong in real life, copy a case, change the input to the real failure's wording, and set what it should have done. Add a lock row for each new thing the hook must refuse. Writing the first locks and cases for a new seat: [build-a-seat.md](build-a-seat.md#4-evals).
 
 ## Limits
 
-- macOS only, and one machine per person: seats run while that Mac is on. Where seats run for a whole team is still open.
+- launchd seats need macOS and run only while that Mac is on. Only a seat with no model and no local files (`health-digest`) can run on GitHub Actions today. Where model-run seats run for a whole team is still open.
 - `dispatcher` and `team-sync` share `meeting-ingest`'s env file (same bot, channel and owner).
 - The evals do not touch real Slack, so they cannot find a missing bot scope or channel invite. The hand run in step 6 does.

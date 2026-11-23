@@ -7,7 +7,7 @@ description: >
   memory", "memory upgrade", or "where are we with the memory system". Also use it
   when the user names an old Move ("Move 9"): map it to a step with the PLAN table.
   This skill carries the sequencing discipline and the pushback rules for the
-  upgrade. The principles live in VISION §3. First action is always to read the
+  upgrade. The principles live in docs/doctrine.md. First action is always to read the
   STATE file. Last action is always to update it.
 ---
 
@@ -17,12 +17,13 @@ description: >
 
 Carry continuity across sessions for the user's memory system upgrade.
 
-- `VISION.md` holds the end state and the principles.
+- `VISION.md` holds the end state.
+- `docs/doctrine.md` holds the principles.
 - `PLAN.md` holds the stages and steps.
 - `STATE.md` holds where we are.
 - This skill holds *behaviour*: how to push back, what to refuse, what to insist on.
 
-If this skill disagrees with VISION or PLAN, VISION and PLAN are correct. Fix this skill.
+If this skill disagrees with the doctrine, VISION or PLAN, they are correct. Fix this skill.
 
 ---
 
@@ -31,10 +32,11 @@ If this skill disagrees with VISION or PLAN, VISION and PLAN are correct. Fix th
 Before you answer anything about the upgrade, read:
 
 1. `1_PROJECTS/memory-system-upgrade/STATE.md`: where we are now
-2. `1_PROJECTS/memory-system-upgrade/VISION.md`: the end state and the principles (§3)
-3. `1_PROJECTS/memory-system-upgrade/PLAN.md`: stages and steps. Old Moves map to steps in its "Old Moves to new steps" table
-4. `memory_index.md`: the current shape of the memory system
-5. `CHANGELOG.md`: the last 30 days of changes
+2. `1_PROJECTS/memory-system-upgrade/VISION.md`: the end state
+3. `docs/doctrine.md`: the principles
+4. `1_PROJECTS/memory-system-upgrade/PLAN.md`: stages and steps. Old Moves map to steps in its "Old Moves to new steps" table
+5. `memory_index.md`: the current shape of the memory system
+6. `CHANGELOG.md`: the last 30 days of changes
 
 If STATE, VISION or PLAN is missing, tell the user. Do not recreate them from memory.
 
@@ -70,9 +72,9 @@ STATE has a "Decisions pending" table. If a decision blocks the step the user as
 
 ## Step 2 — The principles
 
-The principles are in VISION §3. Read them there. Do not copy them into this file (Principle 1: one home per fact).
+The principles are in `docs/doctrine.md`. Read them there. Do not copy them into this file (One home per fact).
 
-Apply them to every answer. If the user pushes against one, push back and name it: "This breaks Principle 6: smallest change that fixes the worst failure." Proceed only if the user says they override the principle and accept the risk. If the override is permanent, the principle changes in VISION, with a record.
+Apply them to every answer. If the user pushes against one, push back and name it: "This breaks Smallest change that fixes the worst failure." Proceed only if the user says they override the principle and accept the risk. If the override is permanent, the principle changes in `docs/doctrine.md` (an engine change: `docs/CONTRIBUTING.md`), with a record.
 
 Also check VISION §6 "What we will not build". A proposal on that list is refused unless VISION changes first.
 
@@ -95,7 +97,7 @@ These are the most likely failure modes (STATE "Failure modes to watch").
 
 ### Refuse: "Let's add tool X since we're in here"
 
-> "Not without a number. Principle 10: a tool earns its place with a measured
+> "Not without a number. Tools come last: a tool earns its place with a measured
 > result. What does the measurement show, and what pilot would prove the fix?"
 
 ### Refuse: scope creep inside a step

@@ -28,7 +28,7 @@ three weeks in. The user decides what survives.
 
 This is a **Thinking-layer** skill (Layer 2). It reads and reasons; it does not
 mutate canonical files. Its output compounds back via `ingest` if it's worth
-keeping (Doctrine 6).
+keeping (doctrine: Answers compound back via ingest).
 
 ## Doctrine (non-negotiable)
 

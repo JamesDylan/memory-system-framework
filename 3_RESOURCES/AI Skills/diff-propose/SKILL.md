@@ -21,7 +21,7 @@ description: >
 
 Turn raw signal into candidate STATE.md edits the user can approve in seconds,
 without duplicating extraction logic inside `daily-slack-review` and `ingest`
-separately (Principle 1 — single source of truth applied to logic, not just
+separately (One home per fact, `docs/doctrine.md`, applied to logic, not just
 facts). This skill is the only place field-mapping and confidence-scoring
 logic lives.
 

@@ -42,7 +42,7 @@ vault; it does not mutate canonical files. Useful connections compound back via
 4. **Semantic search is the engine.** Use QMD `vec`/`hyde` to find distant-but-
    related material — that's exactly what keyword search misses.
 5. **Answers compound back.** A connection worth keeping (a new candidate, a
-   transferable learning) gets filed via `ingest` (Doctrine 6).
+   transferable learning) gets filed via `ingest` (doctrine: Answers compound back via ingest).
 
 ## Step 0 — Read first
 

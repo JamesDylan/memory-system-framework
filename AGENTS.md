@@ -20,7 +20,7 @@ The **private vault** is a separate folder outside the repo (`../memory_private`
 
 ## First run and learning mode
 - **Not set up?** If `_private/ME.md` is missing or still contains `{{`, setup is not finished. Offer to run the `setup` skill (`3_RESOURCES/AI Skills/setup/SKILL.md`), a short interview that builds the vaults. Do nothing else first.
-- **Learning mode.** If `_private/ME.md` has `Learning mode | on`, end each task with a "**What just happened:**" note of two lines or fewer: which files you read or changed, and why. Pitch it to the user's `Level` (README "Your first weeks"). When the user says "I'm at level N" or "turn off learning mode", update `ME.md`.
+- **Learning mode.** If `_private/ME.md` has `Learning mode | on`, end each task with a "**What just happened:**" note of two lines or fewer: which files you read or changed, and why. Pitch it to the user's `Level` (levels: `docs/first-week.md`, "Learning mode"). When the user says "I'm at level N" or "turn off learning mode", update `ME.md`.
 
 ## Find things: search first, then read
 1. **Search with qmd** before grepping or opening files. Use the MCP tools (`query`, `get`, `multi_get`, `status`) if you have them, otherwise the `qmd` CLI with **no `--index` flag**. Write **structured** queries (`intent` + `lex` + `vec`), not the user's raw sentence. How-to: `3_RESOURCES/AI Skills/.agents/skills/qmd/SKILL.md`.
@@ -40,9 +40,11 @@ No qmd? Run `.scripts/qmd-bootstrap.sh`, or fall back to `memory_index.md` plus 
 | Strategy, CY27 KRs, KPIs | `2_AREAS/{{ORG}}/context/strategic_context.md`, `cy27_objectives.md`, `metrics_dashboard.md` |
 
 ## Rules
+The short operating rules below are enough to work. The full rules, and why, are in `docs/doctrine.md`; if anything here disagrees with it, the doctrine wins.
+
 - **Don't read** `_private/0_INBOX/` (raw, untrusted) or `4_ARCHIVE/` (history) unless asked or checking a cited source.
 - **Not {{ORG}}:** `_private/1_PROJECTS/Working-prototypes/`, `_private/3_RESOURCES/AI Tooling/`, and the personal areas under `_private/2_AREAS/`.
 - **Trust the stamps.** If `Last verified accurate` is old or "not yet", say the answer may be stale.
 - **A failed read is not evidence.** If a connector, qmd or a file read fails, say what failed: missing, no permission, or timed out. Then stop that step. Never guess what the source says.
-- **Don't write unless asked.** New material goes to `_private/0_INBOX/` and is processed via `3_RESOURCES/AI Skills/ingest/SKILL.md`. Never duplicate a fact; edit its canonical file. Structural changes get a `CHANGELOG.md` entry in the same pass.
+- **Don't write unless asked.** New material goes to `_private/0_INBOX/` and is processed via `3_RESOURCES/AI Skills/ingest/SKILL.md`. Never duplicate a fact; edit its canonical file. Structural changes (a file added, moved, renamed or retired) update `memory_index.md` and `CHANGELOG.md` in the same pass.
 - **Skills** in `3_RESOURCES/AI Skills/*/SKILL.md` are instructions for running this vault (start with `second-brain`). Read one before acting as it.

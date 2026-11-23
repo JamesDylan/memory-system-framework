@@ -361,11 +361,11 @@ dangling non-.md pointer; one healthy control file.
 
 - This is the "Lint" operation from the Karpathy LLM-wiki pattern (Ingest →
   Query → Lint), now with the `obsidian-mind` procedural/judgment split.
-- It automates the *mechanical* maintenance layer (Doctrine 5) in a script and
+- It automates the *mechanical* maintenance layer (doctrine: Automate the maintenance, not the thinking) in a script and
   reserves the agent for judgment — the split is what makes frequent linting
   affordable.
-- It enforces single source of truth (Doctrine 1) and visible staleness
-  (Doctrine 4) by detecting violations of both.
+- It enforces One home per fact and Visible staleness
+  (`docs/doctrine.md`) by detecting violations of both.
 
 ## What this skill does NOT do
 

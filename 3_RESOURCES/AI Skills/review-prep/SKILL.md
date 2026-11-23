@@ -140,9 +140,9 @@ ephemeral; the *insight* it exposes is what compounds back.
 
 - Phase-2 judgment layer over the Phase-1 Base — the `obsidian-mind`
   procedural/judgment split, same as `lint`.
-- Enforces single source of truth (Doctrine 1) by reading canonical facts through
+- Enforces One home per fact (`docs/doctrine.md`) by reading canonical facts through
   pointers and never creating a second home for them.
-- "Answers compound back" (Doctrine 6): keeper insight re-enters via `ingest`.
+- "Answers compound back via ingest" (`docs/doctrine.md`): keeper insight re-enters via `ingest`.
 
 ## What this skill does NOT do
 

@@ -9,7 +9,7 @@
 
 An external working memory for {{OWNER_NAME}}'s role at {{ORG}} ({{PRODUCT}}). It lets an agent give specific advice from real metrics, relationships, projects and decisions.
 
-**Two vaults:** this folder is the shared vault. Private material lives in a separate private vault mounted at `_private/`. Rules are in `AGENTS.md`.
+**Two vaults:** this folder is the shared vault. Private material lives in a separate private vault mounted at `_private/`. Operating rules are in `AGENTS.md`; the full rules in `docs/doctrine.md`.
 
 ---
 
