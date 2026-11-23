@@ -46,7 +46,9 @@ export function row({ date, findings: f }, minutes) {
   for (const x of bad) if (x.owner !== undefined) by[x.owner || "no owner"] = (by[x.owner || "no owner"] || 0) + 1;
   const owners = Object.entries(by).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
-  if (statesIn + statesOver === 0 || fresh + stale.size === 0) throw new Error("lint output has no STATE or staleness results; did its format change?");
+  // A new vault whose operational files are all stubs has no sources yet (lint says it skipped them): report it, don't throw.
+  const noSourcesYet = fresh + stale.size === 0 && greenCount(f.green, "staleness", /operational file\(s\) not filled in yet, skipped/) > 0;
+  if (statesIn + statesOver === 0 || (fresh + stale.size === 0 && !noSourcesYet)) throw new Error("lint output has no STATE or staleness results; did its format change?");
   return {
     date, states_in_budget: statesIn, states_total: statesIn + statesOver,
     sources_fresh: fresh, sources_total: fresh + stale.size,
@@ -66,7 +68,7 @@ export const csvLine = (r) => COLS.map((c) => cell(r[c])).join(",");
 
 export function slackLine(r) {
   const n = (v) => (v === "" ? "—" : v);
-  return `*Vault health ${r.date}:* STATEs in budget ${r.states_in_budget}/${r.states_total} · sources fresh ${r.sources_fresh}/${r.sources_total}`
+  return `*Vault health ${r.date}:* STATEs in budget ${r.states_in_budget}/${r.states_total} · ${r.sources_total ? `sources fresh ${r.sources_fresh}/${r.sources_total}` : "no sources yet"}`
     + ` · most asks for one owner ${r.asks_max} (target 3 or less) · upkeep ${n(r.minutes_per_week)} min/week`
     + ` · truth rate ${n(r.truth_rate)} · test score ${n(r.test_score)}`;
 }
@@ -103,6 +105,9 @@ if (process.argv.includes("--selftest")) {
   assert.equal(minutesFrom("| Measure | Value |\n| Owner's minutes per week on upkeep | **60–120** | 2026-11-22 |\n| Minutes per week (correction) | **45** | x |"), "45");
   assert.equal(minutesFrom("no table"), "");
   assert.throws(() => row({ date: "d", findings: { red: [], amber: [], green: [] } }, ""), /format change/);
+  const stubs = { date: "d", findings: { red: [], amber: [], green: [...lint.findings.green.slice(2), { check: "staleness", msg: "5 operational file(s) not filled in yet, skipped" }], todo: [{ check: "not-filled", msg: "`s.md`: still the starter text" }] } };
+  assert.match(slackLine(row(stubs, "")), /STATEs in budget 3\/3 · no sources yet · /);
+  assert.throws(() => row({ ...stubs, findings: { ...stubs.findings, green: lint.findings.green.slice(2) } }, ""), /format change/); // a not-filled todo alone is not enough
   console.log("selftest ok");
   process.exit();
 }
