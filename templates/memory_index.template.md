@@ -59,6 +59,7 @@ Register every new canonical file and every skill here. Lint reports skills that
 
 | Skill | Use |
 |---|---|
+| `AI Skills/setup/SKILL.md` | First-run interview that builds the vaults (already run for this vault) |
 | `AI Skills/second-brain/SKILL.md` | Start of any conversation needing work context |
 | `AI Skills/daily-slack-review/SKILL.md` | Daily capture from chat |
 | `AI Skills/ingest/SKILL.md` | Process the inbox |

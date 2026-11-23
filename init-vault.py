@@ -113,7 +113,7 @@ def main():
     a.setdefault("PRODUCT_LOWER", a["PRODUCT"].lower())
     a.setdefault("TODAY", datetime.date.today().isoformat())
     a.setdefault("PILOT_INITIATIVE", "Example Initiative")  # init creates its folder, so ORG.md never names a missing one
-    for k in ("PRODUCT_LONG", "PARTNER", "OWNER_SLACK_ID", "SLACK_WORKSPACE", "PILOT_INITIATIVE", "PILOT", "SECOND_PILOT"):
+    for k in ("ROLE", "MANAGER", "PRODUCT_LONG", "PARTNER", "OWNER_SLACK_ID", "SLACK_WORKSPACE", "PILOT_INITIATIVE", "PILOT", "SECOND_PILOT"):
         a.setdefault(k, f"(set {k})")
     shared = os.path.abspath(os.path.expanduser(a["SHARED_VAULT_PATH"]))
     private = os.path.abspath(os.path.expanduser(a["PRIVATE_VAULT_PATH"]))

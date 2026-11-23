@@ -19,7 +19,7 @@ The **private vault** is a separate folder outside the repo (`../memory_private`
 - Config: `vault-manifest.json` (`vaults`), `.scripts/lint.config.json` (`privateBoundary`).
 
 ## First run and learning mode
-- **Not set up?** If `_private/ME.md` is missing or still contains `{{`, setup is not finished. Offer to guide the user through `README.md` "Set up", using its "Guide mode" rules. Do nothing else first.
+- **Not set up?** If `_private/ME.md` is missing or still contains `{{`, setup is not finished. Offer to run the `setup` skill (`3_RESOURCES/AI Skills/setup/SKILL.md`), a short interview that builds the vaults. Do nothing else first.
 - **Learning mode.** If `_private/ME.md` has `Learning mode | on`, end each task with a "**What just happened:**" note of two lines or fewer: which files you read or changed, and why. Pitch it to the user's `Level` (README "Your first weeks"). When the user says "I'm at level N" or "turn off learning mode", update `ME.md`.
 
 ## Find things: search first, then read

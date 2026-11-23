@@ -12,7 +12,8 @@ Engine scripts and skills read the owner's values from this table. Keep the `| K
 |---|---|
 | Name | {{OWNER_NAME}} |
 | Short name | {{OWNER}} |
-| Role | |
+| Role | {{ROLE}} |
+| Manager | {{MANAGER}} |
 | Slack user ID | `{{OWNER_SLACK_ID}}` |
 | OKR file | `_private/2_AREAS/Career/career_development.md` |
 | Learning mode | on |
@@ -20,7 +21,7 @@ Engine scripts and skills read the owner's values from this table. Keep the `| K
 
 ## Direct reports
 
-Used by the delegation check in `daily-slack-review`.
+Used by the delegation check in `daily-slack-review`. Optional: write `None` if you have no direct reports.
 
 -
 
