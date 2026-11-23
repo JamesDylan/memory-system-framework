@@ -26,17 +26,9 @@ having to think about filing. This is Move 5 of the memory-system-upgrade
 (Karpathy LLM-wiki ingest pipeline). The discipline is the product — no tool
 replaces the routing judgment.
 
-## Doctrine (non-negotiable — from the upgrade PLAN)
+## Doctrine (non-negotiable)
 
-1. **Capture is separate from promotion.** Raw lands in `_private/0_INBOX/`. It only
-   graduates after the insight is extracted and merged into a canonical file.
-2. **Single source of truth.** Every fact has exactly one home. Route to one
-   place. If the same fact would land in two files, one must be a pointer.
-3. **Don't promote prematurely.** An uncommitted feature idea is NOT an
-   initiative. It goes to the candidate backlog, never a new project folder.
-4. **Visible staleness.** Stamp `Last verified accurate` / `Last touched` when
-   you touch an operational file.
-5. **Propose, don't overwrite.** Show the user the diffs. The user approves. Then apply.
+Follow `docs/doctrine.md`. This skill is where these rules bite: **Capture is separate from promotion**, **One home per fact**, **Ideas are candidates until committed**, **Touched vs verified** and **Propose, don't apply**.
 
 ---
 

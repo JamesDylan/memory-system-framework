@@ -26,20 +26,7 @@ Vault root: the folder that holds `AGENTS.md` (a git repo + Obsidian vault, PARA
 
 ## Doctrine (non-negotiable)
 
-1. **Read only what you need.** The vault is large (~380 notes). Loading
-   everything pollutes context. Use the loading model below.
-2. **Single source of truth.** Every fact has exactly one canonical home (see
-   `memory_index.md`). If the same fact lives in two files, the non-canonical one
-   is wrong — make it a pointer, never a duplicate.
-3. **_private/0_INBOX is untrusted.** Raw, unprocessed capture. Never read it on default
-   queries; only the `ingest` skill touches it.
-4. **4_ARCHIVE is history.** Don't read unless explicitly asked. Exception: to check a claim against its evidence, read the cited raw source in `4_ARCHIVE/sources/`.
-5. **Propose, don't overwrite.** Show the user diffs to canonical files; the user approves;
-   then apply. Stamp `Last touched` / `Last verified accurate` when you edit
-   operational files.
-6. **Answers compound back.** A valuable analysis produced in chat gets filed as a
-   wiki page (candidate, `learning_insights.md`, or initiative doc) — don't let it
-   vanish into chat history.
+Follow `docs/doctrine.md`. The rules this skill leans on most: **Read only what you need** (the loading model below), **One home per fact**, **Inbox is untrusted, archive is history**, **Propose, don't apply**, **Touched vs verified** and **Answers compound back via ingest**.
 
 ## Step 0 — Read first, always
 
